@@ -1,0 +1,72 @@
+# Flutter/Dart/Pub related
+.dart_tool/
+.packages
+.pub-cache/
+build/
+flutter_*.png
+
+# Obsolete
+.packages
+
+# Android related
+android/.gradle/
+android/app/build/
+android/local.properties
+*.iml
+.gradle/
+.idea/
+*.jks
+*.keystore
+
+# iOS/macOS related
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+ios/Flutter/Generated.xcconfig
+ios/Pods/
+ios/Runner.xcworkspace/
+ios/build/
+ios/.symlinks/
+ios/.flutter-plugins
+ios/.flutter-plugins-dependencies
+ios/.generated/
+macos/Flutter/GeneratedPluginRegistrant.swift
+macos/Pods/
+macos/Runner.xcworkspace/
+macos/build/
+
+# Web related
+web/.dart_tool/
+web/build/
+
+# Windows related
+windows/flutter/ephemeral/
+windows/build/
+
+# Linux related
+linux/flutter/ephemeral/
+linux/build/
+
+# Fuchsia related
+.fuchsia/
+
+# IntelliJ related
+*.iml
+.idea/
+
+# VS Code related
+.vscode/
+.history/
+
+# Misc
+*.log
+*.tmp
+*.swp
+.DS_Store
+Thumbs.db
+
+# Firebase crashlytics
+crashlytics-build.properties
+
+# Environment secrets
+.env
+.env.*
