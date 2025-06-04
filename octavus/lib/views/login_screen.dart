@@ -1,14 +1,59 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import '../services/AuthenticationService.dart';
+import '../models/LoginModel.dart';
+import '../services/TokenService.dart';
+import '../utils/JwtUtils.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
 
-  void _login() {
-    // lógica de autenticação
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  final usernameController = TextEditingController();
+  final passwordController = TextEditingController();
+  final authService = AuthService();
+  bool _isLoading = false;
+
+  Future<void> _login() async {
+    setState(() => _isLoading = true);
+
+    final user = UserModel(
+      username: usernameController.text.trim(),
+      password: passwordController.text,
+    );
+
+    final token = await authService.login(user);
+
+    setState(() => _isLoading = false);
+
+    if (token != null) {
+      await TokenService.saveToken(token);
+
+      final role = getRoleFromToken(token);
+
+      if (role == 'Aluno') {
+        Navigator.pushReplacementNamed(context, '/home-aluno');
+      } else if (role == 'Professor') {
+        Navigator.pushReplacementNamed(context, '/home-professor');
+      }
+      else if (role == 'CColaborador') {
+        Navigator.pushReplacementNamed(context, '/home-colaborador');
+      }
+    }else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Falha na autenticação. Verifique seus dados.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
-  void _navigateToSignUp(BuildContext context) {
+  void _navigateToSignUp() {
     Navigator.pushNamed(context, '/register');
   }
 
@@ -22,27 +67,20 @@ class LoginScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Center(
-                child: Text(
-                  "Olá,",
-                  style: TextStyle(fontSize: 20),
-                ),
-              ),
+              const Center(child: Text("Olá,", style: TextStyle(fontSize: 20))),
               const Center(
                 child: Text(
                   "Bem-vindo de volta",
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
               ),
               const SizedBox(height: 40),
 
               TextFormField(
+                controller: usernameController,
                 decoration: InputDecoration(
                   prefixIcon: const Icon(Icons.email_outlined),
-                  hintText: 'E-mail',
+                  hintText: 'Username',
                   filled: true,
                   fillColor: const Color(0xFFEFF3F6),
                   border: OutlineInputBorder(
@@ -54,6 +92,7 @@ class LoginScreen extends StatelessWidget {
               const SizedBox(height: 16),
 
               TextFormField(
+                controller: passwordController,
                 obscureText: true,
                 decoration: InputDecoration(
                   prefixIcon: const Icon(Icons.lock_outline),
@@ -69,7 +108,6 @@ class LoginScreen extends StatelessWidget {
               ),
 
               const SizedBox(height: 8),
-
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton(
@@ -87,12 +125,11 @@ class LoginScreen extends StatelessWidget {
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton.icon(
-                  onPressed: _login,
+                  onPressed: _isLoading ? null : _login,
                   icon: const Icon(Icons.login, color: Colors.black),
-                  label: const Text(
-                    "Entrar",
-                    style: TextStyle(color: Colors.black),
-                  ),
+                  label: _isLoading
+                      ? const CircularProgressIndicator(color: Colors.black)
+                      : const Text("Entrar", style: TextStyle(color: Colors.black)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFFFE48A),
                     shape: RoundedRectangleBorder(
@@ -103,7 +140,6 @@ class LoginScreen extends StatelessWidget {
               ),
 
               const SizedBox(height: 24),
-
               Row(
                 children: const [
                   Expanded(child: Divider()),
@@ -116,7 +152,6 @@ class LoginScreen extends StatelessWidget {
               ),
 
               const SizedBox(height: 20),
-
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -133,19 +168,15 @@ class LoginScreen extends StatelessWidget {
               ),
 
               const SizedBox(height: 24),
-
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text("Ainda não possui uma conta? "),
                   GestureDetector(
-                    onTap: () => _navigateToSignUp(context),
+                    onTap: _navigateToSignUp,
                     child: const Text(
                       "Crie agora",
-                      style: TextStyle(
-                        color: Colors.orange,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold),
                     ),
                   )
                 ],
