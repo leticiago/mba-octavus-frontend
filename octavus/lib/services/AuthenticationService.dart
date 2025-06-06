@@ -6,7 +6,7 @@ import 'TokenService.dart';
 class AuthService {
   final String baseUrl = 'http://10.0.2.2:5277/api/authentication'; 
 
-  Future<String?> login(UserModel user) async {
+  Future<String?> login(User user) async {
 
     final response = await http.post(
       Uri.parse('$baseUrl/login'),

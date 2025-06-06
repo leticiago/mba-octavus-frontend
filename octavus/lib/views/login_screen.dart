@@ -21,7 +21,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _login() async {
     setState(() => _isLoading = true);
 
-    final user = UserModel(
+    final user = User(
       username: usernameController.text.trim(),
       password: passwordController.text,
     );
