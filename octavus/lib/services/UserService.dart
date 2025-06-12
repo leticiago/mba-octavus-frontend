@@ -23,4 +23,19 @@ class UserService {
       return false;
     }
   }
+
+  Future<Map<String, dynamic>?> getUserByEmail(String email) async {
+  final response = await http.get(
+    Uri.parse('http://10.0.2.2:5277/api/users/email/$email'),
+    headers: {'Content-Type': 'application/json'},
+  );
+
+  if (response.statusCode == 200) {
+    return jsonDecode(response.body);
+  } else {
+    print('Erro ao buscar usuário: ${response.body}');
+    return null;
+  }
+}
+
 }

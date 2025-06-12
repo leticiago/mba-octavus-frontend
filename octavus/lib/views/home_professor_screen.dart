@@ -1,0 +1,233 @@
+import 'package:flutter/material.dart';
+
+class HomeProfessorScreen extends StatelessWidget {
+  const HomeProfessorScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF5F5F5),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF3A4F7A),
+        title: const Text(
+          'Olá, professor',
+          style: TextStyle(color: Colors.white),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.search, color: Colors.white),
+            onPressed: () {},
+          ),
+        ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildIconCardButton(
+                context,
+                text: 'Criar atividade',
+                icon: Icons.add,
+                routeName: '/criar-atividade',
+              ),
+              _buildIconCardButton(
+                context,
+                text: 'Atribuir atividade',
+                icon: Icons.assignment,
+                routeName: '/atribuir-atividade',
+              ),
+              _buildIconCardButton(
+                context,
+                text: 'Gerenciar alunos',
+                icon: Icons.group,
+                routeName: '/gerenciar-alunos',
+              ),
+              const SizedBox(height: 16),
+              _buildCard(
+                title: 'Ver relatórios de progresso',
+                onPressed: () {
+                  Navigator.pushNamed(context, '/relatorios');
+                },
+                backgroundColor: const Color(0xFFDBE6F6),
+                imageAsset: 'assets/images/report.png',
+              ),
+              const SizedBox(height: 12),
+              _buildMetaCard(
+                context,
+                title: 'Desbloquear metas',
+                onPressed: () {
+                  Navigator.pushNamed(context, '/desbloquear-metas');
+                },
+              ),
+              const SizedBox(height: 24),
+              const Text(
+                'Avaliações pendentes',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 12),
+              _buildPendingEvaluation(
+                atividade: 'Ciclo das quartas',
+                aluno: 'Fulano',
+                progresso: 0.6,
+              ),
+              _buildPendingEvaluation(
+                atividade: 'Escalas maiores',
+                aluno: 'Beltrano',
+                progresso: 0.3,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildIconCardButton(
+    BuildContext context, {
+    required String text,
+    required IconData icon,
+    required String routeName,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12.0),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        decoration: BoxDecoration(
+          color: const Color(0xFFE7EDF8),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: ListTile(
+          title: Text(
+            text,
+            style: const TextStyle(color: Colors.black),
+          ),
+          trailing: Container(
+            decoration: BoxDecoration(
+              color: const Color(0xFF5A76A9),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: IconButton(
+              icon: const Icon(Icons.add),
+              color: const Color(0xFFDDEF71),
+              onPressed: () {
+                Navigator.pushNamed(context, routeName);
+              },
+            ),
+          ),
+          onTap: () {
+            Navigator.pushNamed(context, routeName);
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCard({
+    required String title,
+    required VoidCallback onPressed,
+    required Color backgroundColor,
+    Color textColor = Colors.black,
+    Color buttonColor = const Color(0xFFBFAF00),
+    String? imageAsset,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: TextStyle(fontSize: 16, color: textColor)),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: buttonColor,
+                  foregroundColor: Colors.black,
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+                ),
+                onPressed: onPressed,
+                child: const Text('Ver mais'),
+              ),
+              if (imageAsset != null)
+                Image.asset(
+                  imageAsset,
+                  width: 64,
+                  height: 64,
+                  fit: BoxFit.contain,
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMetaCard(
+    BuildContext context, {
+    required String title,
+    required VoidCallback onPressed,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF000000),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 16,
+              color: Colors.white,
+            ),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFDDEF71),
+              foregroundColor: Colors.black,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(24),
+              ),
+            ),
+            onPressed: onPressed,
+            child: const Text('Ver mais'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPendingEvaluation({
+    required String atividade,
+    required String aluno,
+    required double progresso,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(atividade, style: const TextStyle(fontWeight: FontWeight.bold)),
+          Text('Aluno: $aluno'),
+          const SizedBox(height: 4),
+          LinearProgressIndicator(
+            value: progresso,
+            backgroundColor: Colors.grey.shade300,
+            color: Colors.green,
+          ),
+        ],
+      ),
+    );
+  }
+}

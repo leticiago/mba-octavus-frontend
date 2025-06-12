@@ -4,6 +4,7 @@ import '../services/AuthenticationService.dart';
 import '../models/LoginModel.dart';
 import '../services/TokenService.dart';
 import '../utils/JwtUtils.dart';
+import '../widgets/main_scaffold.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -36,21 +37,18 @@ class _LoginScreenState extends State<LoginScreen> {
       final role = getRoleFromToken(token);
 
       if (role == 'Aluno') {
-        Navigator.pushReplacementNamed(context, '/home-aluno');
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const MainScaffold(role: 'Aluno')),
+        );
       } else if (role == 'Professor') {
-        Navigator.pushReplacementNamed(context, '/home-professor');
-      }
-      else if (role == 'CColaborador') {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const MainScaffold(role: 'Professor')),
+        );
+      }} else {
         Navigator.pushReplacementNamed(context, '/home-colaborador');
       }
-    }else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Falha na autenticação. Verifique seus dados.'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
   }
 
   void _navigateToSignUp() {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'widgets/wave_clipper.dart';
+import './welcome_screen.dart';
 
 class TutorialScreen extends StatefulWidget {
   const TutorialScreen({super.key});
@@ -31,8 +32,13 @@ class _TutorialScreenState extends State<TutorialScreen> {
     if (_currentPage < pages.length - 1) {
       _controller.nextPage(duration: Duration(milliseconds: 300), curve: Curves.easeIn);
     } else {
-      Navigator.pushReplacementNamed(context, '/login');
-    }
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const WelcomeScreen(userName: 'Fulano'),
+          ),
+        );
+      }
   }
 
   @override
