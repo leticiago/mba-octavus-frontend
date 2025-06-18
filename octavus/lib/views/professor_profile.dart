@@ -14,7 +14,6 @@ class PerfilProfessorScreen extends StatelessWidget {
     return SafeArea(
       child: Column(
         children: [
-          _buildHeader(),
           const SizedBox(height: 16),
           _buildProfileCard(),
           const SizedBox(height: 24),
@@ -41,7 +40,6 @@ class PerfilProfessorScreen extends StatelessWidget {
             title: 'Atividades',
             icon: Icons.assignment,
             onTap: () {
-              // Ex: onNavigate(4);
             },
           ),
           _buildOptionTile(
@@ -67,28 +65,6 @@ class PerfilProfessorScreen extends StatelessWidget {
     await UserSessionService.clearSession();
 
     Navigator.of(context).pushReplacementNamed('/login');
-  }
-
-  Widget _buildHeader() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-      decoration: const BoxDecoration(
-        color: Color(0xFF2C3E66),
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(32),
-        ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: const [
-          Text(
-            'Olá, professor',
-            style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-          Icon(Icons.account_circle, color: Colors.white, size: 28),
-        ],
-      ),
-    );
   }
 
   Widget _buildProfileCard() {

@@ -28,4 +28,14 @@ class TokenService {
 
   return payloadMap['email'];
  }
+
+ static String? extractNameFromToken(String token) {
+    final parts = token.split('.');
+    if (parts.length != 3) return null;
+
+    final payload = utf8.decode(base64Url.decode(base64Url.normalize(parts[1])));
+    final payloadMap = jsonDecode(payload);
+
+    return payloadMap['name'];
+  }
 }

@@ -1,25 +1,48 @@
 import 'package:flutter/material.dart';
+import '../services/professorservice.dart';
+import '../services/user_session_service.dart';
+import '../models/pendingreviewmodel.dart';
+import '../core/app_routes.dart';
 
-class HomeProfessorScreen extends StatelessWidget {
-  const HomeProfessorScreen({super.key});
+class HomeProfessorScreen extends StatefulWidget {
+  final ProfessorService professorService;
+
+  const HomeProfessorScreen({
+    super.key,
+    required this.professorService,
+  });
+
+  @override
+  State<HomeProfessorScreen> createState() => _HomeProfessorScreenState();
+}
+
+class _HomeProfessorScreenState extends State<HomeProfessorScreen> {
+  late Future<List<PendingReview>> _pendingReviewsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPendingReviews();
+  }
+
+  void _loadPendingReviews() async {
+    final id = await UserSessionService.getUserId();
+    if (id == null) {
+      setState(() {
+        _pendingReviewsFuture = Future.error('Usuário não autenticado.');
+      });
+      return;
+    }
+
+    setState(() {
+      _pendingReviewsFuture = widget.professorService.getPendingReviews(id);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF3A4F7A),
-        title: const Text(
-          'Olá, professor',
-          style: TextStyle(color: Colors.white),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search, color: Colors.white),
-            onPressed: () {},
-          ),
-        ],
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
@@ -30,7 +53,7 @@ class HomeProfessorScreen extends StatelessWidget {
                 context,
                 text: 'Criar atividade',
                 icon: Icons.add,
-                routeName: '/criar-atividade',
+                routeName: AppRoutes.criarAtividade,
               ),
               _buildIconCardButton(
                 context,
@@ -62,20 +85,48 @@ class HomeProfessorScreen extends StatelessWidget {
                 },
               ),
               const SizedBox(height: 24),
-              const Text(
-                'Avaliações pendentes',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Avaliações pendentes',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/avaliacoes-pendentes');
+                    },
+                    child: const Text('Ver mais'),
+                  ),
+                ],
               ),
               const SizedBox(height: 12),
-              _buildPendingEvaluation(
-                atividade: 'Ciclo das quartas',
-                aluno: 'Fulano',
-                progresso: 0.6,
-              ),
-              _buildPendingEvaluation(
-                atividade: 'Escalas maiores',
-                aluno: 'Beltrano',
-                progresso: 0.3,
+              FutureBuilder<List<PendingReview>>(
+                future: _pendingReviewsFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Text('Erro: ${snapshot.error}');
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Text('Nenhuma avaliação pendente');
+                  } else {
+                    final reviews = snapshot.data!;
+                    final itemsToShow = reviews.length > 2
+                        ? reviews.sublist(0, 2)
+                        : reviews;
+
+                    return Column(
+                      children: itemsToShow
+                          .map((pr) => _buildPendingEvaluation(
+                                atividade: pr.atividade,
+                                aluno: pr.aluno,
+                                progresso: pr.progresso,
+                              ))
+                          .toList(),
+                    );
+                  }
+                },
               ),
             ],
           ),
@@ -109,7 +160,7 @@ class HomeProfessorScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
             ),
             child: IconButton(
-              icon: const Icon(Icons.add),
+              icon: Icon(icon),
               color: const Color(0xFFDDEF71),
               onPressed: () {
                 Navigator.pushNamed(context, routeName);

@@ -4,7 +4,6 @@ class VincularAtividadeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _buildAppBar(),
       bottomNavigationBar: _buildBottomNavBar(),
       body: Padding(
         padding: const EdgeInsets.all(16),
@@ -38,12 +37,6 @@ class VincularAtividadeScreen extends StatelessWidget {
       ),
     );
   }
-
-  AppBar _buildAppBar() => AppBar(
-        backgroundColor: const Color(0xFF2C3E66),
-        title: const Text("Olá, professor"),
-        actions: const [Padding(padding: EdgeInsets.only(right: 16), child: Icon(Icons.account_circle))],
-      );
 
   Widget _buildInput({required IconData icon, required String text}) => Container(
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),

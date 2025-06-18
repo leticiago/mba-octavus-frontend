@@ -7,6 +7,9 @@ import '../views/manage_students.dart';
 import '../views/home_professor_screen.dart';
 import '../views/initial_screen.dart';
 import '../views/professor_profile.dart';
+import '../views/create_activity_screen.dart';
+import '../views/create_question_and_answer_activity_screen.dart';
+
 
 class MainScaffold extends StatefulWidget {
   final String role;
@@ -28,6 +31,7 @@ class _MainScaffoldState extends State<MainScaffold> {
   int _selectedIndex = 0;
   String? token;
   String? userId;
+  String? userName;
   bool _loading = true;
   bool _hasError = false;
 
@@ -46,7 +50,11 @@ class _MainScaffoldState extends State<MainScaffold> {
       token = await TokenService.getToken();
       userId = await UserSessionService.getUserId();
 
-      if (token == null || userId == null) {
+      if (token != null) {
+        userName = TokenService.extractNameFromToken(token!);
+      }
+
+      if (token == null || userId == null || userName == null) {
         _hasError = true;
       }
     } catch (e) {
@@ -79,19 +87,18 @@ class _MainScaffoldState extends State<MainScaffold> {
       );
     }
 
-    if (_hasError || token == null || userId == null) {
+    if (_hasError || token == null || userId == null || userName == null) {
       return const Scaffold(
         body: Center(child: Text("Erro ao carregar dados.")),
       );
     }
 
     final professorService = ProfessorService(
-      baseUrl: widget.baseUrl ?? 'http://10.0.2.2:5277',
-      token: token!,
+      baseUrl: widget.baseUrl ?? 'http://10.0.2.2:5277'
     );
 
     final List<Widget> screens = [
-      const HomeProfessorScreen(), 
+      HomeProfessorScreen(professorService: ProfessorService(baseUrl: 'http://10.0.2.2:5277')),
       const InitialScreen(),
       PerfilProfessorScreen(onNavigate: _navigateTo),
       GerenciarAlunosScreen(
@@ -101,23 +108,82 @@ class _MainScaffoldState extends State<MainScaffold> {
         onNavigate: _navigateTo,
       ),
       VincularAlunoScreen(onBack: () => _navigateTo(3)),
+      CreateActivityScreen(),
+      CreateQuestionAnswerActivityScreen(),
     ];
 
     return Scaffold(
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(80),
+        child: Container(
+          decoration: const BoxDecoration(
+            color: Color(0xFF35456b),
+            borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(20),
+              bottomRight: Radius.circular(20),
+            ),
+          ),
+          padding: const EdgeInsets.only(top: 40, left: 20, right: 20, bottom: 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Olá, ${userName ?? 'professor'}',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const Icon(
+                Icons.account_circle_outlined,
+                color: Colors.white,
+                size: 28,
+              ),
+            ],
+          ),
+        ),
+      ),
       body: IndexedStack(
         index: _selectedIndex,
         children: screens,
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex > 2 ? 0 : _selectedIndex,
-        selectedItemColor: Colors.orange,
-        unselectedItemColor: Colors.grey,
-        onTap: _navigateTo,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Início'),
-          BottomNavigationBarItem(icon: Icon(Icons.assignment), label: 'Atividades'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
-        ],
+      bottomNavigationBar: Container(
+        decoration: const BoxDecoration(
+          color: Color(0xFF35456b),
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 8,
+              offset: Offset(0, -2),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
+          child: BottomNavigationBar(
+            backgroundColor: const Color(0xFF35456b),
+            currentIndex: _selectedIndex > 2 ? 0 : _selectedIndex,
+            selectedItemColor: Colors.white,
+            unselectedItemColor: Colors.white70,
+            selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600),
+            unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w400),
+            onTap: _navigateTo,
+            type: BottomNavigationBarType.fixed,
+            items: const [
+              BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Início'),
+              BottomNavigationBarItem(icon: Icon(Icons.assignment), label: 'Atividades'),
+              BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
+            ],
+          ),
+        ),
       ),
     );
   }

@@ -7,12 +7,6 @@ class HomeAlunoScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xFFF2F2F2),
-      appBar: AppBar(
-        title: const Text("Olá, aluno"),
-        centerTitle: true,
-        backgroundColor: Color(0xFF3B4B66),
-        actions: [IconButton(onPressed: () {}, icon: Icon(Icons.search))],
-      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: 0,
         items: const [

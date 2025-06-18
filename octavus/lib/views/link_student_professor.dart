@@ -55,7 +55,7 @@ class _VincularAlunoScreenState extends State<VincularAlunoScreen> {
     );
 
     try {
-      final service = ProfessorService(baseUrl: 'http://10.0.2.2:5277', token: token!);
+      final service = ProfessorService(baseUrl: 'http://10.0.2.2:5277');
       await service.linkStudent(studentProfessor);
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -81,7 +81,6 @@ class _VincularAlunoScreenState extends State<VincularAlunoScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _buildAppBar(),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : Padding(
@@ -135,18 +134,4 @@ class _VincularAlunoScreenState extends State<VincularAlunoScreen> {
             ),
     );
   }
-
-  AppBar _buildAppBar() => AppBar(
-        backgroundColor: const Color(0xFF2C3E66),
-        title: const Text("Olá, professor"),
-        leading: widget.onBack != null
-            ? IconButton(
-                icon: const Icon(Icons.arrow_back),
-                onPressed: widget.onBack,
-              )
-            : null,
-        actions: const [
-          Padding(padding: EdgeInsets.only(right: 16), child: Icon(Icons.account_circle)),
-        ],
-      );
 }

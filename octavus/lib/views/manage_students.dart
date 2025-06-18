@@ -77,32 +77,6 @@ class _GerenciarAlunosScreenState extends State<GerenciarAlunosScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-              decoration: const BoxDecoration(
-                color: Color(0xFF223B67),
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(16),
-                  bottomRight: Radius.circular(16),
-                ),
-              ),
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back, color: Colors.white),
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
-                  const SizedBox(width: 8),
-                  const Text(
-                    'Olá, professor',
-                    style: TextStyle(color: Colors.white, fontSize: 18),
-                  ),
-                  const Spacer(),
-                  const Icon(Icons.search, color: Colors.white),
-                ],
-              ),
-            ),
-
             const SizedBox(height: 12),
             const Text(
               'Alunos',
