@@ -5,7 +5,8 @@ import '../models/instrumentmodel.dart';
 import '../services/instrumentservice.dart';
 import '../services/professorservice.dart';
 import '../services/user_session_service.dart';
-import '../widgets/main_scaffold.dart'; 
+import '../widgets/main_scaffold.dart';
+import '../views/create_question_and_answer_activity_screen.dart';
 
 class CreateActivityScreen extends StatefulWidget {
   const CreateActivityScreen({super.key});
@@ -16,7 +17,6 @@ class CreateActivityScreen extends StatefulWidget {
 
 class _CreateActivityScreenState extends State<CreateActivityScreen> {
   final _formKey = GlobalKey<FormState>();
-
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
 
@@ -24,12 +24,12 @@ class _CreateActivityScreenState extends State<CreateActivityScreen> {
   int _difficulty = 0;
   DateTime? _selectedDate;
   Instrument? _selectedInstrument;
+  List<Instrument> _instruments = [];
+  bool _isSubmitting = false;
 
   final List<String> _types = ['Pergunta e resposta', 'Arrasta e solta', 'Livre'];
   final List<String> _difficulties = ['Fácil', 'Médio', 'Difícil'];
-  List<Instrument> _instruments = [];
-
-  bool _isSubmitting = false;
+  final Color lightYellow = const Color(0xFFF7E8B5);
 
   @override
   void initState() {
@@ -40,12 +40,10 @@ class _CreateActivityScreenState extends State<CreateActivityScreen> {
   Future<void> _loadInstruments() async {
     try {
       final instruments = await InstrumentService().getInstruments();
-      setState(() {
-        _instruments = instruments;
-      });
-    } catch (e) {
+      setState(() => _instruments = instruments);
+    } catch (_) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao carregar instrumentos')),
+        const SnackBar(content: Text('Erro ao carregar instrumentos')),
       );
     }
   }
@@ -58,15 +56,11 @@ class _CreateActivityScreenState extends State<CreateActivityScreen> {
       firstDate: DateTime(now.year - 5),
       lastDate: DateTime(now.year + 5),
     );
-    if (picked != null) {
-      setState(() {
-        _selectedDate = picked;
-      });
-    }
+    if (picked != null) setState(() => _selectedDate = picked);
   }
 
   Future<void> _submitActivity() async {
-  if (_formKey.currentState?.validate() != true || _selectedDate == null || _selectedInstrument == null) {
+  if (!_formKey.currentState!.validate() || _selectedDate == null || _selectedInstrument == null) {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Preencha todos os campos')),
     );
@@ -91,37 +85,37 @@ class _CreateActivityScreenState extends State<CreateActivityScreen> {
     );
 
     final service = ProfessorService(baseUrl: 'http://10.0.2.2:5277');
-    await service.createActivity(activity);
+    final activityId = await service.createActivity(activity);
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Atividade criada com sucesso!')),
-    );
-
-    int activityScreenIndex;
-    switch (_type) {
-      case 0: 
-        activityScreenIndex = 6;
-        break;
-      case 1: 
-        activityScreenIndex = 7;
-        break;
-      case 2:
-        activityScreenIndex = 8;
-        break;
-      default:
-        activityScreenIndex = 0;
-    }
-
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (_) => MainScaffold(
-          role: 'professor',
-          initialIndex: activityScreenIndex,
-          baseUrl: 'http://10.0.2.2:5277',
+    if (_type == 0) { 
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => CreateQuestionAndAnswerActivityScreen(activityId: activityId),
         ),
-      ),
-    );
+      );
+    } else {
+      int activityScreenIndex;
+      switch (_type) {
+        case 1:
+          activityScreenIndex = 7; break;
+        case 2:
+          activityScreenIndex = 8; break;
+        default:
+          activityScreenIndex = 0;
+      }
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => MainScaffold(
+            role: 'professor',
+            initialIndex: activityScreenIndex,
+            baseUrl: 'http://10.0.2.2:5277',
+          ),
+        ),
+      );
+    }
   } catch (e) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Erro ao criar atividade: $e')),
@@ -135,7 +129,6 @@ class _CreateActivityScreenState extends State<CreateActivityScreen> {
   @override
   Widget build(BuildContext context) {
     final borderRadius = BorderRadius.circular(10);
-    final Color lightYellow = const Color(0xFFF7E8B5);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -146,10 +139,7 @@ class _CreateActivityScreenState extends State<CreateActivityScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Cadastre uma atividade',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
-              ),
+              const Text('Cadastre uma atividade', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24)),
               const SizedBox(height: 6),
               const Text(
                 'Crie exercícios de pergunta e resposta, arrasta-e-solta ou livres para seus alunos',
@@ -215,9 +205,7 @@ class _CreateActivityScreenState extends State<CreateActivityScreen> {
                               ? 'Data'
                               : DateFormat('dd/MM/yyyy').format(_selectedDate!),
                           style: TextStyle(
-                            color: _selectedDate == null
-                                ? Colors.black38
-                                : Colors.black87,
+                            color: _selectedDate == null ? Colors.black38 : Colors.black87,
                             fontSize: 16,
                           ),
                         ),
@@ -281,10 +269,7 @@ class _CreateActivityScreenState extends State<CreateActivityScreen> {
         value: value,
         items: List.generate(
           items.length,
-          (index) => DropdownMenuItem(
-            value: index,
-            child: Text(items[index]),
-          ),
+          (index) => DropdownMenuItem(value: index, child: Text(items[index])),
         ),
         onChanged: onChanged,
       ),
@@ -305,12 +290,7 @@ class _CreateActivityScreenState extends State<CreateActivityScreen> {
           border: InputBorder.none,
           icon: Icon(Icons.music_note, color: Colors.black54),
         ),
-        items: _instruments
-            .map((inst) => DropdownMenuItem(
-                  value: inst,
-                  child: Text(inst.name),
-                ))
-            .toList(),
+        items: _instruments.map((inst) => DropdownMenuItem(value: inst, child: Text(inst.name))).toList(),
         onChanged: (value) => setState(() => _selectedInstrument = value),
       ),
     );

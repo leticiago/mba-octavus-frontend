@@ -14,6 +14,7 @@ import '../views/manage_students.dart';
 import '../views/initial_screen.dart';
 import '../views/create_question_and_answer_activity_screen.dart';
 import '../widgets/main_scaffold.dart'; 
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AppRoutes {
   static const String initial = '/';
@@ -27,6 +28,11 @@ class AppRoutes {
   static const String linkStudent = '/link-student';
   static const String manageStudents = '/manage-students';
   static const String criarAtividade = '/criar-atividade';
+
+static Future<String?> _getSavedActivityId() async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getString('createdActivityId');
+}
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -99,7 +105,25 @@ class AppRoutes {
         );
 
       case '/criar-pergunta-resposta':
-        return MaterialPageRoute(builder: (_) => const CreateQuestionAnswerActivityScreen());
+  return MaterialPageRoute(
+    builder: (_) => FutureBuilder<String?>(
+      future: _getSavedActivityId(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        } else if (snapshot.hasError || !snapshot.hasData || snapshot.data == null) {
+          return const Scaffold(
+            body: Center(child: Text('ID da atividade não encontrado')),
+          );
+        } else {
+          final activityId = snapshot.data!;
+          return CreateQuestionAndAnswerActivityScreen(activityId: activityId);
+        }
+      },
+    ),
+  );
       // case '/criar-arrasta-solta':
       //   return MaterialPageRoute(builder: (_) => const CreateDragAndDropActivityScreen());
       // case '/criar-livre':

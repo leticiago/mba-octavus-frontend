@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import '../services/tokenservice.dart';
 import '../services/user_session_service.dart';
 import '../services/professorservice.dart';
@@ -10,16 +12,15 @@ import '../views/professor_profile.dart';
 import '../views/create_activity_screen.dart';
 import '../views/create_question_and_answer_activity_screen.dart';
 
-
 class MainScaffold extends StatefulWidget {
   final String role;
-  final String? baseUrl;
+  final String baseUrl;
   final int initialIndex;
 
   const MainScaffold({
     Key? key,
     required this.role,
-    this.baseUrl,
+    this.baseUrl = 'http://10.0.2.2:5277/api/',
     this.initialIndex = 0,
   }) : super(key: key);
 
@@ -32,6 +33,7 @@ class _MainScaffoldState extends State<MainScaffold> {
   String? token;
   String? userId;
   String? userName;
+  String? activityId;
   bool _loading = true;
   bool _hasError = false;
 
@@ -53,6 +55,9 @@ class _MainScaffoldState extends State<MainScaffold> {
       if (token != null) {
         userName = TokenService.extractNameFromToken(token!);
       }
+
+      final prefs = await SharedPreferences.getInstance();
+      activityId = prefs.getString('createdActivityId');
 
       if (token == null || userId == null || userName == null) {
         _hasError = true;
@@ -94,11 +99,13 @@ class _MainScaffoldState extends State<MainScaffold> {
     }
 
     final professorService = ProfessorService(
-      baseUrl: widget.baseUrl ?? 'http://10.0.2.2:5277'
+      baseUrl: widget.baseUrl ?? 'http://10.0.2.2:5277',
     );
 
     final List<Widget> screens = [
-      HomeProfessorScreen(professorService: ProfessorService(baseUrl: 'http://10.0.2.2:5277')),
+      HomeProfessorScreen(
+        professorService: professorService,
+      ),
       const InitialScreen(),
       PerfilProfessorScreen(onNavigate: _navigateTo),
       GerenciarAlunosScreen(
@@ -109,7 +116,7 @@ class _MainScaffoldState extends State<MainScaffold> {
       ),
       VincularAlunoScreen(onBack: () => _navigateTo(3)),
       CreateActivityScreen(),
-      CreateQuestionAnswerActivityScreen(),
+      CreateQuestionAndAnswerActivityScreen(activityId: activityId ?? ''),
     ];
 
     return Scaffold(

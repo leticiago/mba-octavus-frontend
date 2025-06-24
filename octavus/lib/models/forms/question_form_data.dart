@@ -1,11 +1,16 @@
+import 'answer_form_data.dart';
 import 'package:flutter/material.dart';
 
 class QuestionFormData {
   final TextEditingController titleController = TextEditingController();
-  final List<AnswerFormData> answers = List.generate(3, (_) => AnswerFormData());
-}
+  List<AnswerFormData> answers;
+  int correctAnswerIndex;
 
-class AnswerFormData {
-  final TextEditingController textController = TextEditingController();
-  bool isCorrect = false;
+  QuestionFormData({
+    String questionTitle = '',
+    List<AnswerFormData>? answers,
+    this.correctAnswerIndex = 0,
+  }) : answers = answers ?? [AnswerFormData(), AnswerFormData(), AnswerFormData()] {
+    titleController.text = questionTitle;
+  }
 }

@@ -5,12 +5,14 @@ import '../models/studentprofessormodel.dart';
 import '../services/tokenservice.dart';  
 import '../models/pendingreviewmodel.dart';
 import '../models/activitymodel.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 
 class ProfessorService {
   final String baseUrl;
 
-  ProfessorService({required this.baseUrl});
+  ProfessorService({String? baseUrl})
+      : baseUrl = baseUrl ?? 'http://10.0.2.2:5277/api/';
 
   Future<List<Student>> getStudentsByProfessor(String professorId) async {
     final token = await TokenService.getToken();
@@ -71,24 +73,33 @@ class ProfessorService {
     }
   }
 
-  Future<void> createActivity(Activity activity) async {
-    final token = await TokenService.getToken();
-    if (token == null) {
-      throw Exception('Token de autenticação não encontrado');
-    }
-
-    final url = Uri.parse('$baseUrl/api/activity');
-    final response = await http.post(
-      url,
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode(activity.toJson()),
-    );
-
-    if (response.statusCode != 200 && response.statusCode != 201) {
-      throw Exception('Falha ao criar atividade: ${response.statusCode}');
-    }
+  Future<String> createActivity(Activity activity) async {
+  final token = await TokenService.getToken();
+  if (token == null) {
+    throw Exception('Token de autenticação não encontrado');
   }
+
+  final url = Uri.parse('$baseUrl/api/activity');
+  final response = await http.post(
+    url,
+    headers: {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+    },
+    body: jsonEncode(activity.toJson()),
+  );
+
+  if (response.statusCode != 200 && response.statusCode != 201) {
+    throw Exception('Falha ao criar atividade: ${response.statusCode}');
+  }
+
+  final responseData = jsonDecode(response.body);
+  final activityId = responseData['id'] as String;
+
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.setString('last_created_activity_id', activityId);
+
+  return activityId;
+}
+
 }
