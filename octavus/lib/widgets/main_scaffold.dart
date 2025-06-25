@@ -13,6 +13,8 @@ import '../views/create_activity_screen.dart';
 import '../views/create_question_and_answer_activity_screen.dart';
 import '../views/create_drag_and_drop_activity.dart';
 import '../views/create_free_text_activity.dart';
+import '../views/link_student_activity.dart';
+import '../models/studentmodel.dart';
 
 class MainScaffold extends StatefulWidget {
   final String role;
@@ -38,6 +40,7 @@ class _MainScaffoldState extends State<MainScaffold> {
   String? activityId;
   bool _loading = true;
   bool _hasError = false;
+  Student? _selectedStudentId;
 
   final GlobalKey<State<GerenciarAlunosScreen>> _gerenciarAlunosKey =
       GlobalKey<State<GerenciarAlunosScreen>>();
@@ -101,7 +104,7 @@ class _MainScaffoldState extends State<MainScaffold> {
     }
 
     final professorService = ProfessorService(
-      baseUrl: widget.baseUrl ?? 'http://10.0.2.2:5277',
+      baseUrl: widget.baseUrl,
     );
 
     final List<Widget> screens = [
@@ -115,12 +118,26 @@ class _MainScaffoldState extends State<MainScaffold> {
         professorId: userId!,
         professorService: professorService,
         onNavigate: _navigateTo,
+        onStudentSelected: (studentId) {
+          setState(() {
+            _selectedStudentId = Student(id: studentId, name: '');
+            _selectedIndex = 9;
+          });
+        },
       ),
       VincularAlunoScreen(onBack: () => _navigateTo(3)),
-      CreateActivityScreen(),
+      const CreateActivityScreen(),
       CreateQuestionAndAnswerActivityScreen(activityId: activityId ?? ''),
       CreateDragAndDropActivityScreen(activityId: activityId ?? ''),
       CreateFreeTextActivityScreen(activityId: activityId ?? ''),
+      _selectedStudentId != null
+          ? LinkActivityToStudentScreen(
+              professorId: userId!,
+              student: _selectedStudentId!,
+              professorService: professorService,
+              onNavigate: _navigateTo,
+            )
+          : const Center(child: Text('Nenhum aluno selecionado')),
     ];
 
     return Scaffold(

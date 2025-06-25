@@ -18,6 +18,7 @@ class HomeProfessorScreen extends StatefulWidget {
 
 class _HomeProfessorScreenState extends State<HomeProfessorScreen> {
   late Future<List<PendingReview>> _pendingReviewsFuture;
+  
 
   @override
   void initState() {
@@ -25,18 +26,20 @@ class _HomeProfessorScreenState extends State<HomeProfessorScreen> {
     _loadPendingReviews();
   }
 
-  void _loadPendingReviews() async {
+  Future<List<PendingReview>> _loadPendingReviews() async {
     final id = await UserSessionService.getUserId();
     if (id == null) {
       setState(() {
         _pendingReviewsFuture = Future.error('Usuário não autenticado.');
       });
-      return;
+      return Future.error('Usuário não autenticado.');
     }
 
     setState(() {
       _pendingReviewsFuture = widget.professorService.getPendingReviews(id);
     });
+
+    return widget.professorService.getPendingReviews(id);
   }
 
   @override
@@ -109,21 +112,19 @@ class _HomeProfessorScreenState extends State<HomeProfessorScreen> {
                   } else if (snapshot.hasError) {
                     return Text('Erro: ${snapshot.error}');
                   } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return const Text('Nenhuma avaliação pendente');
+                    return const Text('Não há avaliações pendentes');
                   } else {
                     final reviews = snapshot.data!;
-                    final itemsToShow = reviews.length > 2
-                        ? reviews.sublist(0, 2)
-                        : reviews;
+                    final itemsToShow = reviews.length > 3 ? reviews.sublist(0, 3) : reviews;
 
                     return Column(
-                      children: itemsToShow
-                          .map((pr) => _buildPendingEvaluation(
-                                atividade: pr.atividade,
-                                aluno: pr.aluno,
-                                progresso: pr.progresso,
-                              ))
-                          .toList(),
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ...itemsToShow.map((pr) => _buildPendingEvaluation(
+                              atividade: pr.atividade,
+                              aluno: pr.aluno,
+                            )),
+                      ],
                     );
                   }
                 },
@@ -261,8 +262,7 @@ class _HomeProfessorScreenState extends State<HomeProfessorScreen> {
 
   Widget _buildPendingEvaluation({
     required String atividade,
-    required String aluno,
-    required double progresso,
+    required String aluno
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -271,12 +271,6 @@ class _HomeProfessorScreenState extends State<HomeProfessorScreen> {
         children: [
           Text(atividade, style: const TextStyle(fontWeight: FontWeight.bold)),
           Text('Aluno: $aluno'),
-          const SizedBox(height: 4),
-          LinearProgressIndicator(
-            value: progresso,
-            backgroundColor: Colors.grey.shade300,
-            color: Colors.green,
-          ),
         ],
       ),
     );

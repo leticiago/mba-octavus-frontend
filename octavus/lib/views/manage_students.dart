@@ -6,12 +6,14 @@ class GerenciarAlunosScreen extends StatefulWidget {
   final String professorId;
   final ProfessorService professorService;
   final void Function(int) onNavigate;
+  final void Function(String studentId) onStudentSelected;
 
   const GerenciarAlunosScreen({
     Key? key,
     required this.professorId,
     required this.professorService,
     required this.onNavigate,
+    required this.onStudentSelected,
   }) : super(key: key);
 
   @override
@@ -134,10 +136,8 @@ class _GerenciarAlunosScreenState extends State<GerenciarAlunosScreen> {
                                       ),
                                       IconButton(
                                         icon: const Icon(Icons.add_circle, color: Colors.blueAccent),
-                                        onPressed: () {
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            SnackBar(content: Text('Botão + pressionado para ${aluno.name}')),
-                                          );
+                                         onPressed: () {
+                                          widget.onStudentSelected(aluno.id);
                                         },
                                       ),
                                       IconButton(
