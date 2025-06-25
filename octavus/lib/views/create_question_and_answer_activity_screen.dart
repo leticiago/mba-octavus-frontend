@@ -39,7 +39,7 @@ class _CreateQuestionAndAnswerActivityScreenState
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final service = QuestionService(baseUrl: baseUrl);
+    final service = QuestionService();
     final success = await service.postQuestions(
       activityId: widget.activityId,
       questions: questions,

@@ -59,7 +59,7 @@ class ProfessorService {
       throw Exception('Token de autenticação não encontrado');
     }
 
-    final url = Uri.parse('$baseUrl/api/Professor/$professorId/pending-reviews');
+    final url = Uri.parse('$baseUrl/api/professor/$professorId/pending-reviews');
     final response = await http.get(url, headers: {
       'Authorization': 'Bearer $token',
       'Content-Type': 'application/json',

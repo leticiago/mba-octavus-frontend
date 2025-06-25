@@ -7,6 +7,9 @@ import '../services/professorservice.dart';
 import '../services/user_session_service.dart';
 import '../widgets/main_scaffold.dart';
 import '../views/create_question_and_answer_activity_screen.dart';
+import '../views/create_drag_and_drop_activity.dart';
+import '../views/create_free_text_activity.dart';
+
 
 class CreateActivityScreen extends StatefulWidget {
   const CreateActivityScreen({super.key});
@@ -87,35 +90,31 @@ class _CreateActivityScreenState extends State<CreateActivityScreen> {
     final service = ProfessorService(baseUrl: 'http://10.0.2.2:5277');
     final activityId = await service.createActivity(activity);
 
-    if (_type == 0) { 
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (_) => CreateQuestionAndAnswerActivityScreen(activityId: activityId),
-        ),
-      );
-    } else {
-      int activityScreenIndex;
-      switch (_type) {
-        case 1:
-          activityScreenIndex = 7; break;
-        case 2:
-          activityScreenIndex = 8; break;
-        default:
-          activityScreenIndex = 0;
-      }
+    Widget nextScreen;
 
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (_) => MainScaffold(
-            role: 'professor',
-            initialIndex: activityScreenIndex,
-            baseUrl: 'http://10.0.2.2:5277',
-          ),
-        ),
-      );
+    switch (_type) {
+      case 0:
+        nextScreen = CreateQuestionAndAnswerActivityScreen(activityId: activityId);
+        break;
+      case 1:
+        nextScreen = CreateDragAndDropActivityScreen(activityId: activityId);
+        break;
+      case 2:
+        nextScreen = CreateFreeTextActivityScreen(
+          activityId: activityId,
+        );
+        break;
+      default:
+        nextScreen = MainScaffold(
+          role: 'professor',
+          baseUrl: 'http://10.0.2.2:5277',
+        );
+        break;
     }
+
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (_) => nextScreen),
+    );
   } catch (e) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Erro ao criar atividade: $e')),
@@ -124,6 +123,7 @@ class _CreateActivityScreenState extends State<CreateActivityScreen> {
     setState(() => _isSubmitting = false);
   }
 }
+
 
 
   @override

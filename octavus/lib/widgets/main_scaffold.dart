@@ -11,6 +11,8 @@ import '../views/initial_screen.dart';
 import '../views/professor_profile.dart';
 import '../views/create_activity_screen.dart';
 import '../views/create_question_and_answer_activity_screen.dart';
+import '../views/create_drag_and_drop_activity.dart';
+import '../views/create_free_text_activity.dart';
 
 class MainScaffold extends StatefulWidget {
   final String role;
@@ -20,7 +22,7 @@ class MainScaffold extends StatefulWidget {
   const MainScaffold({
     Key? key,
     required this.role,
-    this.baseUrl = 'http://10.0.2.2:5277/api/',
+    this.baseUrl = 'http://10.0.2.2:5277/api',
     this.initialIndex = 0,
   }) : super(key: key);
 
@@ -117,6 +119,8 @@ class _MainScaffoldState extends State<MainScaffold> {
       VincularAlunoScreen(onBack: () => _navigateTo(3)),
       CreateActivityScreen(),
       CreateQuestionAndAnswerActivityScreen(activityId: activityId ?? ''),
+      CreateDragAndDropActivityScreen(activityId: activityId ?? ''),
+      CreateFreeTextActivityScreen(activityId: activityId ?? ''),
     ];
 
     return Scaffold(

@@ -13,6 +13,8 @@ import '../views/link_student_professor.dart';
 import '../views/manage_students.dart';
 import '../views/initial_screen.dart';
 import '../views/create_question_and_answer_activity_screen.dart';
+import '../views/create_drag_and_drop_activity.dart';
+import '../views/create_free_text_activity.dart';
 import '../widgets/main_scaffold.dart'; 
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -105,29 +107,67 @@ static Future<String?> _getSavedActivityId() async {
         );
 
       case '/criar-pergunta-resposta':
-  return MaterialPageRoute(
-    builder: (_) => FutureBuilder<String?>(
-      future: _getSavedActivityId(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
-        } else if (snapshot.hasError || !snapshot.hasData || snapshot.data == null) {
-          return const Scaffold(
-            body: Center(child: Text('ID da atividade não encontrado')),
-          );
-        } else {
-          final activityId = snapshot.data!;
-          return CreateQuestionAndAnswerActivityScreen(activityId: activityId);
-        }
-      },
-    ),
-  );
-      // case '/criar-arrasta-solta':
-      //   return MaterialPageRoute(builder: (_) => const CreateDragAndDropActivityScreen());
-      // case '/criar-livre':
-      //   return MaterialPageRoute(builder: (_) => const CreateFreeActivityScreen());
+      return MaterialPageRoute(
+        builder: (_) => FutureBuilder<String?>(
+          future: _getSavedActivityId(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Scaffold(
+                body: Center(child: CircularProgressIndicator()),
+              );
+            } else if (snapshot.hasError || !snapshot.hasData || snapshot.data == null) {
+              return const Scaffold(
+                body: Center(child: Text('ID da atividade não encontrado')),
+              );
+            } else {
+              final activityId = snapshot.data!;
+              return CreateQuestionAndAnswerActivityScreen(activityId: activityId);
+            }
+          },
+        ),
+      );
+      case '/criar-arrasta-solta':
+      return MaterialPageRoute(
+        builder: (_) => FutureBuilder<String?>(
+          future: _getSavedActivityId(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Scaffold(
+                body: Center(child: CircularProgressIndicator()),
+              );
+            } else if (snapshot.hasError || !snapshot.hasData || snapshot.data == null) {
+              return const Scaffold(
+                body: Center(child: Text('ID da atividade não encontrado')),
+              );
+            } else {
+              final activityId = snapshot.data!;
+              return CreateDragAndDropActivityScreen(activityId: activityId);
+            }
+          },
+        ),
+      );
+
+    case '/criar-livre':
+      return MaterialPageRoute(
+        builder: (_) => FutureBuilder<String?>(
+          future: _getSavedActivityId(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Scaffold(
+                body: Center(child: CircularProgressIndicator()),
+              );
+            } else if (snapshot.hasError || !snapshot.hasData || snapshot.data == null) {
+              return const Scaffold(
+                body: Center(child: Text('ID da atividade não encontrado')),
+              );
+            } else {
+              final activityId = snapshot.data!;
+              return CreateFreeTextActivityScreen(activityId: activityId);
+            }
+          },
+        ),
+      );
+
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(
