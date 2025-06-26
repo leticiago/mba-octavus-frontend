@@ -22,7 +22,7 @@ class _CreateActivityScreenState extends State<CreateActivityScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
-
+  bool _isPublic = false;
   int _type = 0;
   int _difficulty = 0;
   DateTime? _selectedDate;
@@ -82,7 +82,7 @@ class _CreateActivityScreenState extends State<CreateActivityScreen> {
       type: _type,
       date: _selectedDate!,
       level: _difficulty,
-      isPublic: true,
+      isPublic: _isPublic,
       instrumentId: _selectedInstrument!.id,
       professorId: professorId,
     );
@@ -214,7 +214,23 @@ class _CreateActivityScreenState extends State<CreateActivityScreen> {
                   ),
                 ),
               ),
-
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Tornar atividade pública?',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  Switch(
+                    value: _isPublic,
+                    activeColor: Colors.green,
+                    onChanged: (value) {
+                      setState(() => _isPublic = value);
+                    },
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
               const Spacer(),
 
               SizedBox(

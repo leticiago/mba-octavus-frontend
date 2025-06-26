@@ -33,7 +33,6 @@ class UserService {
   if (response.statusCode == 200) {
     return jsonDecode(response.body);
   } else {
-    print('Erro ao buscar usuário: ${response.body}');
     return null;
   }
 }

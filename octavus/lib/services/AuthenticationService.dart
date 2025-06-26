@@ -29,7 +29,6 @@ class AuthService {
 
       return token;
     } else {
-      print('Erro ao fazer login: ${response.body}');
       return null;
     }
   }
@@ -38,7 +37,6 @@ Future<Map<String, dynamic>?> getUserByEmail(String email) async {
   final token = await TokenService.getToken();
 
   if (token == null) {
-    print('Token não encontrado');
     return null;
   }
 
@@ -53,7 +51,6 @@ Future<Map<String, dynamic>?> getUserByEmail(String email) async {
   if (response.statusCode == 200) {
     return jsonDecode(response.body);
   } else {
-    print('Erro ao buscar usuário por e-mail: ${response.body}');
     return null;
   }
 }

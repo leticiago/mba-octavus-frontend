@@ -39,14 +39,12 @@ class _LinkActivityToStudentScreenState extends State<LinkActivityToStudentScree
   @override
   void initState() {
     super.initState();
-    print('initState chamado');
     _loadInstrumentsAndActivities();
   }
 
   Future<void> _loadInstrumentsAndActivities() async {
     try {
       final instrs = await InstrumentService().getInstruments();
-      print('Instrumentos recebidos: ${instrs.length}');
       final acts = await widget.professorService.getActivitiesByProfessor(widget.professorId);
 
       setState(() {

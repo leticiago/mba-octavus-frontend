@@ -54,7 +54,6 @@ class _CreateQuestionAndAnswerActivityScreenState
 
   @override
   Widget build(BuildContext context) {
-     print('activityId recebido na tela de perguntas: ${widget.activityId}');
     return Scaffold(
       backgroundColor: const Color(0xFFF9F9F9),
       body: SafeArea(

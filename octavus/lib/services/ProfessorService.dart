@@ -13,7 +13,7 @@ class ProfessorService {
   final String baseUrl;
 
   ProfessorService({String? baseUrl})
-      : baseUrl = baseUrl ?? 'http://10.0.2.2:5277';
+      : baseUrl = baseUrl ?? 'http://10.0.2.2:5277/api';
 
   Future<List<Student>> getStudentsByProfessor(String professorId) async {
     final token = await TokenService.getToken();

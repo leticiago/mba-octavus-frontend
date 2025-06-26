@@ -110,6 +110,7 @@ class _MainScaffoldState extends State<MainScaffold> {
     final List<Widget> screens = [
       HomeProfessorScreen(
         professorService: professorService,
+        onNavigate: _navigateTo,
       ),
       const InitialScreen(),
       PerfilProfessorScreen(onNavigate: _navigateTo),

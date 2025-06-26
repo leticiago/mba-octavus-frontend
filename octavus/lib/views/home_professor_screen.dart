@@ -6,10 +6,12 @@ import '../core/app_routes.dart';
 
 class HomeProfessorScreen extends StatefulWidget {
   final ProfessorService professorService;
+  final void Function(int) onNavigate;
 
   const HomeProfessorScreen({
     super.key,
     required this.professorService,
+    required this.onNavigate,
   });
 
   @override
@@ -18,7 +20,6 @@ class HomeProfessorScreen extends StatefulWidget {
 
 class _HomeProfessorScreenState extends State<HomeProfessorScreen> {
   late Future<List<PendingReview>> _pendingReviewsFuture;
-  
 
   @override
   void initState() {
@@ -35,11 +36,12 @@ class _HomeProfessorScreenState extends State<HomeProfessorScreen> {
       return Future.error('Usuário não autenticado.');
     }
 
+    final future = widget.professorService.getPendingReviews(id);
     setState(() {
-      _pendingReviewsFuture = widget.professorService.getPendingReviews(id);
+      _pendingReviewsFuture = future;
     });
 
-    return widget.professorService.getPendingReviews(id);
+    return future;
   }
 
   @override
@@ -68,7 +70,7 @@ class _HomeProfessorScreenState extends State<HomeProfessorScreen> {
                 context,
                 text: 'Gerenciar alunos',
                 icon: Icons.group,
-                routeName: '/gerenciar-alunos',
+                onTap: () => widget.onNavigate(3),
               ),
               const SizedBox(height: 16),
               _buildCard(
@@ -83,9 +85,6 @@ class _HomeProfessorScreenState extends State<HomeProfessorScreen> {
               _buildMetaCard(
                 context,
                 title: 'Desbloquear metas',
-                onPressed: () {
-                  Navigator.pushNamed(context, '/desbloquear-metas');
-                },
               ),
               const SizedBox(height: 24),
               Row(
@@ -115,16 +114,18 @@ class _HomeProfessorScreenState extends State<HomeProfessorScreen> {
                     return const Text('Não há avaliações pendentes');
                   } else {
                     final reviews = snapshot.data!;
-                    final itemsToShow = reviews.length > 3 ? reviews.sublist(0, 3) : reviews;
+                    final itemsToShow = reviews.length > 3
+                        ? reviews.sublist(0, 3)
+                        : reviews;
 
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ...itemsToShow.map((pr) => _buildPendingEvaluation(
-                              atividade: pr.atividade,
-                              aluno: pr.aluno,
-                            )),
-                      ],
+                      children: itemsToShow
+                          .map((pr) => _buildPendingEvaluation(
+                                atividade: pr.atividade,
+                                aluno: pr.aluno,
+                              ))
+                          .toList(),
                     );
                   }
                 },
@@ -140,7 +141,8 @@ class _HomeProfessorScreenState extends State<HomeProfessorScreen> {
     BuildContext context, {
     required String text,
     required IconData icon,
-    required String routeName,
+    String? routeName,
+    VoidCallback? onTap,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12.0),
@@ -163,14 +165,20 @@ class _HomeProfessorScreenState extends State<HomeProfessorScreen> {
             child: IconButton(
               icon: Icon(icon),
               color: const Color(0xFFDDEF71),
-              onPressed: () {
-                Navigator.pushNamed(context, routeName);
-              },
+              onPressed: onTap ??
+                  () {
+                    if (routeName != null) {
+                      Navigator.pushNamed(context, routeName);
+                    }
+                  },
             ),
           ),
-          onTap: () {
-            Navigator.pushNamed(context, routeName);
-          },
+          onTap: onTap ??
+              () {
+                if (routeName != null) {
+                  Navigator.pushNamed(context, routeName);
+                }
+              },
         ),
       ),
     );
@@ -222,12 +230,13 @@ class _HomeProfessorScreenState extends State<HomeProfessorScreen> {
     );
   }
 
-  Widget _buildMetaCard(
-    BuildContext context, {
-    required String title,
-    required VoidCallback onPressed,
-  }) {
-    return Container(
+Widget _buildMetaCard(
+  BuildContext context, {
+  required String title,
+}) {
+  return Opacity(
+    opacity: 0.4, // <- Isso deixa tudo "apagado"
+    child: Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: const Color(0xFF000000),
@@ -252,17 +261,19 @@ class _HomeProfessorScreenState extends State<HomeProfessorScreen> {
                 borderRadius: BorderRadius.circular(24),
               ),
             ),
-            onPressed: onPressed,
+            onPressed: null, // <- desabilita o botão
             child: const Text('Ver mais'),
           ),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
+
 
   Widget _buildPendingEvaluation({
     required String atividade,
-    required String aluno
+    required String aluno,
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
