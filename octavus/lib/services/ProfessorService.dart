@@ -144,4 +144,32 @@ class ProfessorService {
     }
   }
 
+  Future<void> evaluateActivity({
+  required String studentId,
+  required String activityId,
+  required int score,
+  required String comment,
+  }) async {
+    final token = await TokenService.getToken();
+    final url = Uri.parse('$baseUrl/professor/evaluate-activity');
+
+    final response = await http.put(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({
+        'studentId': studentId,
+        'activityId': activityId,
+        'score': score,
+        'comment': comment,
+      }),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Erro ao avaliar atividade');
+    }
+  }
+
 }

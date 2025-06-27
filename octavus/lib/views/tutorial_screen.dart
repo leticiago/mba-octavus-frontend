@@ -16,15 +16,15 @@ class _TutorialScreenState extends State<TutorialScreen> {
   final List<Map<String, String>> pages = [
     {
       'title': 'Pratique de onde estiver',
-      'description': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit...',
+      'description': 'Tenha acesso aos exercícios e materiais a qualquer hora e em qualquer lugar, direto no seu dispositivo. Aprenda no seu ritmo, sem limitações',
     },
     {
       'title': 'Se conecte com seus alunos',
-      'description': 'Nunc vulputate libero et velit interdum, ac aliquet odio mattis...',
+      'description': 'Envie atividades, acompanhe o progresso dos seus alunos e ofereça feedback personalizado para um aprendizado mais eficiente e motivador',
     },
     {
       'title': 'Não pode corrigir atividades?\nAtue como um colaborador!',
-      'description': 'Aliquet odio mattis. Lorem ipsum dolor sit amet...',
+      'description': 'Se você não pode corrigir, ainda assim pode ajudar como colaborador, revisando conteúdos, organizando materiais e apoiando a comunidade',
     },
   ];
 

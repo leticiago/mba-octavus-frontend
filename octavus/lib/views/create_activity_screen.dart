@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
 import '../models/activitymodel.dart';
 import '../models/instrumentmodel.dart';
 import '../services/instrumentservice.dart';
 import '../services/professorservice.dart';
 import '../services/user_session_service.dart';
-import '../widgets/main_scaffold.dart';
-import '../views/create_question_and_answer_activity_screen.dart';
-import '../views/create_drag_and_drop_activity.dart';
-import '../views/create_free_text_activity.dart';
-
 
 class CreateActivityScreen extends StatefulWidget {
-  const CreateActivityScreen({super.key});
+  final void Function(int) onNavigate;
+
+  const CreateActivityScreen({
+    super.key,
+    required this.onNavigate,
+  });
 
   @override
   State<CreateActivityScreen> createState() => _CreateActivityScreenState();
@@ -63,68 +64,54 @@ class _CreateActivityScreenState extends State<CreateActivityScreen> {
   }
 
   Future<void> _submitActivity() async {
-  if (!_formKey.currentState!.validate() || _selectedDate == null || _selectedInstrument == null) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Preencha todos os campos')),
-    );
-    return;
-  }
-
-  setState(() => _isSubmitting = true);
-
-  try {
-    final professorId = await UserSessionService.getUserId();
-    if (professorId == null) throw Exception('ID do professor não encontrado');
-
-    final activity = Activity(
-      name: _titleController.text,
-      description: _descriptionController.text,
-      type: _type,
-      date: _selectedDate!,
-      level: _difficulty,
-      isPublic: _isPublic,
-      instrumentId: _selectedInstrument!.id,
-      professorId: professorId,
-    );
-
-    final service = ProfessorService(baseUrl: 'http://10.0.2.2:5277');
-    final activityId = await service.createActivity(activity);
-
-    Widget nextScreen;
-
-    switch (_type) {
-      case 0:
-        nextScreen = CreateQuestionAndAnswerActivityScreen(activityId: activityId);
-        break;
-      case 1:
-        nextScreen = CreateDragAndDropActivityScreen(activityId: activityId);
-        break;
-      case 2:
-        nextScreen = CreateFreeTextActivityScreen(
-          activityId: activityId,
-        );
-        break;
-      default:
-        nextScreen = MainScaffold(
-          role: 'professor',
-          baseUrl: 'http://10.0.2.2:5277',
-        );
-        break;
+    if (!_formKey.currentState!.validate() || _selectedDate == null || _selectedInstrument == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Preencha todos os campos')),
+      );
+      return;
     }
 
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => nextScreen),
-    );
-  } catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Erro ao criar atividade: $e')),
-    );
-  } finally {
-    setState(() => _isSubmitting = false);
+    setState(() => _isSubmitting = true);
+
+    try {
+      final professorId = await UserSessionService.getUserId();
+      if (professorId == null) throw Exception('ID do professor não encontrado');
+
+      final activity = Activity(
+        name: _titleController.text,
+        description: _descriptionController.text,
+        type: _type,
+        date: _selectedDate!,
+        level: _difficulty,
+        isPublic: _isPublic,
+        instrumentId: _selectedInstrument!.id,
+        professorId: professorId,
+      );
+
+      final service = ProfessorService(baseUrl: 'http://10.0.2.2:5277/api');
+      final activityId = await service.createActivity(activity);
+
+      switch (_type) {
+        case 0:
+          widget.onNavigate(6);
+          break;
+        case 1:
+          widget.onNavigate(7);
+          break;
+        case 2:
+          widget.onNavigate(8);
+          break;
+        default:
+          widget.onNavigate(0);
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro ao criar atividade: $e')),
+      );
+    } finally {
+      setState(() => _isSubmitting = false);
+    }
   }
-}
-
-
 
   @override
   Widget build(BuildContext context) {

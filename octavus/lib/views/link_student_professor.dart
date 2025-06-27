@@ -78,58 +78,95 @@ class _VincularAlunoScreenState extends State<VincularAlunoScreen> {
     }
   }
 
+  InputDecoration _inputDecoration(String label, {IconData? icon}) {
+    return InputDecoration(
+      labelText: label,
+      filled: true,
+      fillColor: const Color(0xFFF0F5F5),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+      prefixIcon: icon != null ? Icon(icon) : null,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
-          : Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text("Vincular aluno", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 8),
-                  const Text("Vincule um aluno ao seu usuário para que ele acesse suas atividades."),
-                  const SizedBox(height: 16),
-                  DropdownButtonFormField<Instrument>(
-                    value: selectedInstrument,
-                    items: instrumentos
-                        .map((instrumento) => DropdownMenuItem(
-                              value: instrumento,
-                              child: Text(instrumento.name),
-                            ))
-                        .toList(),
-                    decoration: const InputDecoration(
-                      labelText: 'Instrumento',
-                      border: OutlineInputBorder(),
+          : SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Título e seta
+                    Row(
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.arrow_back),
+                          onPressed: () => widget.onBack?.call(),
+                        ),
+                        const Expanded(
+                          child: Center(
+                            child: Text(
+                              'Vincular aluno',
+                              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 48),
+                      ],
                     ),
-                    onChanged: (value) {
-                      setState(() {
-                        selectedInstrument = value;
-                      });
-                    },
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: emailController,
-                    decoration: const InputDecoration(
-                      labelText: 'E-mail do aluno',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.email),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Vincule um aluno da plataforma ao seu usuário para que ele possa ter acesso às suas atividades cadastradas.',
+                      style: TextStyle(fontSize: 16),
+                      textAlign: TextAlign.center,
                     ),
-                    keyboardType: TextInputType.emailAddress,
-                  ),
-                  const Spacer(),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFFFE49C),
-                      minimumSize: const Size(double.infinity, 48),
+                    const SizedBox(height: 24),
+
+                    DropdownButtonFormField<Instrument>(
+                      value: selectedInstrument,
+                      items: instrumentos
+                          .map((instrumento) => DropdownMenuItem(
+                                value: instrumento,
+                                child: Text(instrumento.name),
+                              ))
+                          .toList(),
+                      decoration: _inputDecoration('Instrumento'),
+                      onChanged: (value) {
+                        setState(() {
+                          selectedInstrument = value;
+                        });
+                      },
                     ),
-                    onPressed: vincularAluno,
-                    child: const Text("Vincular >", style: TextStyle(color: Colors.black)),
-                  ),
-                ],
+                    const SizedBox(height: 16),
+
+                    TextField(
+                      controller: emailController,
+                      decoration: _inputDecoration('E-mail do aluno', icon: Icons.email),
+                      keyboardType: TextInputType.emailAddress,
+                    ),
+
+                    const Spacer(),
+
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFFFE49C),
+                        ),
+                        onPressed: vincularAluno,
+                        child: const Text(
+                          "Vincular >",
+                          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
     );

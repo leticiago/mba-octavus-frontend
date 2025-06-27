@@ -65,7 +65,7 @@ static Future<String?> _getSavedActivityId() async {
         return MaterialPageRoute(
           builder: (_) => MainScaffold(
             role: 'professor',
-            baseUrl: 'http://10.0.2.2:5277',
+            baseUrl: 'http://10.0.2.2:5277/api',
             initialIndex: 0,
           ),
         );
@@ -74,7 +74,7 @@ static Future<String?> _getSavedActivityId() async {
         return MaterialPageRoute(
           builder: (_) => MainScaffold(
             role: 'professor',
-            baseUrl: 'http://10.0.2.2:5277',
+            baseUrl: 'http://10.0.2.2:5277/api',
             initialIndex: 2, 
           ),
         );
@@ -83,7 +83,7 @@ static Future<String?> _getSavedActivityId() async {
         return MaterialPageRoute(
           builder: (_) => MainScaffold(
             role: 'professor',
-            baseUrl: 'http://10.0.2.2:5277',
+            baseUrl: 'http://10.0.2.2:5277/api',
             initialIndex: 4,
           ),
         );
@@ -92,7 +92,7 @@ static Future<String?> _getSavedActivityId() async {
         return MaterialPageRoute(
           builder: (_) => MainScaffold(
             role: 'professor',
-            baseUrl: 'http://10.0.2.2:5277',
+            baseUrl: 'http://10.0.2.2:5277/api',
             initialIndex: 3, 
           ),
         );
@@ -101,7 +101,7 @@ static Future<String?> _getSavedActivityId() async {
         return MaterialPageRoute(
           builder: (_) => MainScaffold(
             role: 'professor',
-            baseUrl: 'http://10.0.2.2:5277',
+            baseUrl: 'http://10.0.2.2:5277/api',
             initialIndex: 5,
           ),
         );

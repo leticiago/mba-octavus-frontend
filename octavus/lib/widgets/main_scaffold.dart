@@ -14,7 +14,9 @@ import '../views/create_question_and_answer_activity_screen.dart';
 import '../views/create_drag_and_drop_activity.dart';
 import '../views/create_free_text_activity.dart';
 import '../views/link_student_activity.dart';
+import '../views/link_student_activity_all.dart';
 import '../models/studentmodel.dart';
+import '../views/evaluate_activity_screen.dart';
 
 class MainScaffold extends StatefulWidget {
   final String role;
@@ -40,7 +42,12 @@ class _MainScaffoldState extends State<MainScaffold> {
   String? activityId;
   bool _loading = true;
   bool _hasError = false;
+
   Student? _selectedStudentId;
+
+  String? _evaluateStudentId;
+  String? _evaluateActivityId;
+  String? _evaluateStudentResponse;
 
   final GlobalKey<State<GerenciarAlunosScreen>> _gerenciarAlunosKey =
       GlobalKey<State<GerenciarAlunosScreen>>();
@@ -89,6 +96,17 @@ class _MainScaffoldState extends State<MainScaffold> {
     });
   }
 
+  void _openEvaluateActivity({
+    required String studentId,
+    required String activityId,
+  }) {
+    setState(() {
+      _evaluateStudentId = studentId;
+      _evaluateActivityId = activityId;
+      _selectedIndex = 10; 
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_loading) {
@@ -111,6 +129,7 @@ class _MainScaffoldState extends State<MainScaffold> {
       HomeProfessorScreen(
         professorService: professorService,
         onNavigate: _navigateTo,
+        onEvaluateActivity: _openEvaluateActivity,
       ),
       const InitialScreen(),
       PerfilProfessorScreen(onNavigate: _navigateTo),
@@ -127,7 +146,7 @@ class _MainScaffoldState extends State<MainScaffold> {
         },
       ),
       VincularAlunoScreen(onBack: () => _navigateTo(3)),
-      const CreateActivityScreen(),
+      CreateActivityScreen(onNavigate: _navigateTo),
       CreateQuestionAndAnswerActivityScreen(activityId: activityId ?? ''),
       CreateDragAndDropActivityScreen(activityId: activityId ?? ''),
       CreateFreeTextActivityScreen(activityId: activityId ?? ''),
@@ -139,6 +158,18 @@ class _MainScaffoldState extends State<MainScaffold> {
               onNavigate: _navigateTo,
             )
           : const Center(child: Text('Nenhum aluno selecionado')),
+      EvaluateActivityScreen(
+        studentId: _evaluateStudentId ?? '',
+        activityId: _evaluateActivityId ?? '',
+        studentResponse: _evaluateStudentResponse ?? '',
+        professorService: professorService,
+        onNavigate: _navigateTo,
+      ),
+      LinkActivityToStudentAllScreen(
+        professorId: userId!, 
+        professorService: professorService,
+        onNavigate: (index) => setState(() => _selectedIndex = index),
+      ),
     ];
 
     return Scaffold(
@@ -152,7 +183,8 @@ class _MainScaffoldState extends State<MainScaffold> {
               bottomRight: Radius.circular(20),
             ),
           ),
-          padding: const EdgeInsets.only(top: 40, left: 20, right: 20, bottom: 10),
+          padding:
+              const EdgeInsets.only(top: 40, left: 20, right: 20, bottom: 10),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [

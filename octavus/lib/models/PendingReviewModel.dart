@@ -17,7 +17,7 @@ class PendingReview {
       atividade: json['activityName'] ?? '',
       aluno: json['studentName'] ?? '',
       alunoId: json['studentId'] ?? '',
-      atividadeId: json['activitytId'] ?? '', 
+      atividadeId: json['activityId'] ?? '', 
     );
   }
 }

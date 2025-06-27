@@ -57,34 +57,74 @@ class _CreateQuestionAndAnswerActivityScreenState
     return Scaffold(
       backgroundColor: const Color(0xFFF9F9F9),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-          child: Form(
-            key: _formKey,
-            child: ListView(
-              children: [
-                const Text(
-                  'Cadastrar Pergunta–Resposta',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        child: Stack(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 16, 24, 80),
+              child: Form(
+                key: _formKey,
+                child: ListView(
+                  children: [
+                    Align(
+                      alignment: Alignment.topLeft,
+                      child: IconButton(
+                        icon: const Icon(Icons.arrow_back),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                    ),
+
+                    const SizedBox(height: 4),
+                    const Text(
+                      'Cadastrar Pergunta–Resposta',
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 4),
+                    const Text(
+                      'Crie questões com alternativas para esta atividade.',
+                      style: TextStyle(fontSize: 14, color: Colors.black54),
+                    ),
+                    const SizedBox(height: 20),
+
+                    _buildDropdownQtd(),
+
+                    const SizedBox(height: 20),
+                    for (int i = 0; i < numberOfQuestions; i++)
+                      _buildQuestionCard(i),
+
+                    const SizedBox(height: 100),
+                  ],
                 ),
-                const SizedBox(height: 4),
-                const Text(
-                  'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-                  style: TextStyle(fontSize: 14, color: Colors.black54),
-                ),
-                const SizedBox(height: 20),
-
-                _buildDropdownQtd(),
-
-                const SizedBox(height: 20),
-                for (int i = 0; i < numberOfQuestions; i++)
-                  _buildQuestionCard(i),
-
-                const SizedBox(height: 20),
-                _buildSubmitButton(),
-              ],
+              ),
             ),
-          ),
+
+            Positioned(
+              bottom: 20,
+              left: 24,
+              right: 24,
+              child: SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFFFD965),
+                    foregroundColor: Colors.black,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    elevation: 2,
+                  ),
+                  onPressed: _submit,
+                  child: const Text(
+                    'Cadastrar  >',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -185,24 +225,6 @@ class _CreateQuestionAndAnswerActivityScreenState
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildSubmitButton() {
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFFFFD965),
-        foregroundColor: Colors.black,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(30),
-        ),
-        padding: const EdgeInsets.symmetric(vertical: 16),
-      ),
-      onPressed: _submit,
-      child: const Text(
-        'Cadastrar  >',
-        style: TextStyle(fontWeight: FontWeight.bold),
       ),
     );
   }

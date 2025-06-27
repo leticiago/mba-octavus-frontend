@@ -20,7 +20,6 @@ class _CreateFreeTextActivityScreenState
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _mediaUrlController = TextEditingController();
-
   bool _isSubmitting = false;
 
   @override
@@ -52,12 +51,10 @@ class _CreateFreeTextActivityScreenState
 
       if (success) Navigator.pop(context);
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Erro: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Erro: $e'),
+        backgroundColor: Colors.red,
+      ));
     } finally {
       setState(() => _isSubmitting = false);
     }
@@ -76,8 +73,8 @@ class _CreateFreeTextActivityScreenState
       decoration: InputDecoration(
         labelText: label,
         border: const OutlineInputBorder(),
-        filled: true,
         fillColor: const Color(0xFFF4F7F8),
+        filled: true,
       ),
     );
   }
@@ -85,54 +82,70 @@ class _CreateFreeTextActivityScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Cadastrar Atividade: Texto Livre'),
-        backgroundColor: const Color(0xFFFFE48A),
-        foregroundColor: Colors.black,
-      ),
+      backgroundColor: const Color(0xFFF9F9F9),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                const SizedBox(height: 12),
-                _buildTextField(controller: _titleController, label: 'Título'),
-                const SizedBox(height: 12),
-                _buildTextField(
-                  controller: _descriptionController,
-                  label: 'Descrição',
-                  maxLines: 4,
-                ),
-                const SizedBox(height: 12),
-                _buildTextField(
-                  controller: _mediaUrlController,
-                  label: 'Mídia (link ou nome do arquivo)',
-                ),
-                const Spacer(),
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: _isSubmitting ? null : _submitForm,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFFFE48A),
-                      foregroundColor: Colors.black,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.black),
+                onPressed: () => Navigator.pop(context),
+              ),
+              const Text(
+                'Cadastrar Texto Livre',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 6),
+              const Text(
+                'Preencha as informações abaixo para criar a atividade.',
+                style: TextStyle(fontSize: 14, color: Colors.black54),
+              ),
+              const SizedBox(height: 20),
+              Expanded(
+                child: Form(
+                  key: _formKey,
+                  child: ListView(
+                    children: [
+                      _buildTextField(controller: _titleController, label: 'Título'),
+                      const SizedBox(height: 12),
+                      _buildTextField(
+                        controller: _descriptionController,
+                        label: 'Descrição',
+                        maxLines: 4,
                       ),
-                    ),
-                    child: _isSubmitting
-                        ? const CircularProgressIndicator(color: Colors.black)
-                        : const Text(
-                            'Cadastrar >',
-                            style: TextStyle(fontSize: 18),
-                          ),
+                      const SizedBox(height: 12),
+                      _buildTextField(
+                        controller: _mediaUrlController,
+                        label: 'Mídia (link ou nome do arquivo)',
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: _isSubmitting ? null : _submitForm,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFFFD965),
+                    foregroundColor: Colors.black,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                  child: _isSubmitting
+                      ? const CircularProgressIndicator(color: Colors.black)
+                      : const Text(
+                          'Cadastrar >',
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                ),
+              ),
+            ],
           ),
         ),
       ),

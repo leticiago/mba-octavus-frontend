@@ -80,9 +80,21 @@ class _GerenciarAlunosScreenState extends State<GerenciarAlunosScreen> {
         child: Column(
           children: [
             const SizedBox(height: 12),
-            const Text(
-              'Alunos',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back_ios_new),
+                    onPressed: () => widget.onNavigate(0),
+                  ),
+                  const SizedBox(width: 4),
+                  const Text(
+                    'Alunos',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 12),
 
@@ -93,55 +105,34 @@ class _GerenciarAlunosScreenState extends State<GerenciarAlunosScreen> {
                       ? Center(child: Text(error!))
                       : alunos.isEmpty
                           ? const Center(child: Text('Nenhum aluno vinculado.'))
-                          : ListView.builder(
+                          : ListView.separated(
                               itemCount: alunos.length,
+                              separatorBuilder: (_, __) => const Divider(height: 1, color: Colors.grey),
                               padding: const EdgeInsets.symmetric(horizontal: 16),
                               itemBuilder: (context, index) {
                                 final aluno = alunos[index];
-                                return Container(
-                                  margin: const EdgeInsets.symmetric(vertical: 8),
-                                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(15),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black12,
-                                        blurRadius: 4,
-                                        offset: Offset(0, 2),
-                                      ),
-                                    ],
-                                  ),
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 10),
                                   child: Row(
                                     children: [
-                                      CircleAvatar(
-                                        radius: 24,
-                                        backgroundColor: Colors.amber[200],
+                                      const CircleAvatar(
+                                        radius: 22,
+                                        backgroundColor: Colors.amber,
                                       ),
                                       const SizedBox(width: 12),
                                       Expanded(
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              aluno.name,
-                                              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                                            ),
-                                            // Text(
-                                            //   aluno.course ?? '',
-                                            //   style: const TextStyle(color: Colors.grey),
-                                            // ),
-                                          ],
+                                        child: Text(
+                                          aluno.name,
+                                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                                         ),
                                       ),
-                                      IconButton(
-                                        icon: const Icon(Icons.add_circle, color: Colors.blueAccent),
-                                         onPressed: () {
-                                          widget.onStudentSelected(aluno.id);
-                                        },
+                                      _actionButton(
+                                        icon: Icons.add_circle,
+                                        onPressed: () => widget.onStudentSelected(aluno.id),
                                       ),
-                                      IconButton(
-                                        icon: const Icon(Icons.link_off, color: Colors.green),
+                                      const SizedBox(width: 4),
+                                      _actionButton(
+                                        icon: Icons.link_off,
                                         onPressed: () => unlinkStudent(aluno),
                                       ),
                                     ],
@@ -176,6 +167,23 @@ class _GerenciarAlunosScreenState extends State<GerenciarAlunosScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _actionButton({required IconData icon, required VoidCallback onPressed}) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 2),
+      decoration: const BoxDecoration(
+        color: Color(0xFF5D7AAA),
+        shape: BoxShape.circle,
+      ),
+      child: IconButton(
+        icon: Icon(icon, color: Color(0xFFDDFE71)),
+        onPressed: onPressed,
+        iconSize: 20,
+        padding: const EdgeInsets.all(8),
+        constraints: const BoxConstraints(),
       ),
     );
   }

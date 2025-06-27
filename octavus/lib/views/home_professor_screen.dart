@@ -6,12 +6,17 @@ import '../core/app_routes.dart';
 
 class HomeProfessorScreen extends StatefulWidget {
   final ProfessorService professorService;
-  final void Function(int) onNavigate;
+  final void Function(int)? onNavigate;
+  final void Function({
+    required String studentId,
+    required String activityId,
+  })? onEvaluateActivity;
 
   const HomeProfessorScreen({
     super.key,
     required this.professorService,
-    required this.onNavigate,
+    this.onNavigate,
+    this.onEvaluateActivity,
   });
 
   @override
@@ -19,12 +24,21 @@ class HomeProfessorScreen extends StatefulWidget {
 }
 
 class _HomeProfessorScreenState extends State<HomeProfessorScreen> {
-  late Future<List<PendingReview>> _pendingReviewsFuture;
+  late Future<List<PendingReview>> _pendingReviewsFuture = Future.value([]);
 
   @override
   void initState() {
     super.initState();
     _loadPendingReviews();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final route = ModalRoute.of(context);
+    if (route != null && route.isCurrent) {
+      _loadPendingReviews(); 
+    }
   }
 
   Future<List<PendingReview>> _loadPendingReviews() async {
@@ -64,13 +78,13 @@ class _HomeProfessorScreenState extends State<HomeProfessorScreen> {
                 context,
                 text: 'Atribuir atividade',
                 icon: Icons.assignment,
-                routeName: '/atribuir-atividade',
+                onTap: () => widget.onNavigate?.call(11),
               ),
               _buildIconCardButton(
                 context,
                 text: 'Gerenciar alunos',
                 icon: Icons.group,
-                onTap: () => widget.onNavigate(3),
+                onTap: () => widget.onNavigate?.call(3),
               ),
               const SizedBox(height: 16),
               _buildCard(
@@ -117,15 +131,20 @@ class _HomeProfessorScreenState extends State<HomeProfessorScreen> {
                     final itemsToShow = reviews.length > 3
                         ? reviews.sublist(0, 3)
                         : reviews;
-
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: itemsToShow
-                          .map((pr) => _buildPendingEvaluation(
-                                atividade: pr.atividade,
-                                aluno: pr.aluno,
-                              ))
-                          .toList(),
+                      children: itemsToShow.map((pr) {
+                        return _buildPendingEvaluation(
+                          atividade: pr.atividade,
+                          aluno: pr.aluno,
+                          onTap: () {
+                            widget.onEvaluateActivity?.call(
+                              studentId: pr.alunoId,
+                              activityId: pr.atividadeId,
+                            );
+                          },
+                        );
+                      }).toList(),
                     );
                   }
                 },
@@ -153,10 +172,7 @@ class _HomeProfessorScreenState extends State<HomeProfessorScreen> {
           borderRadius: BorderRadius.circular(12),
         ),
         child: ListTile(
-          title: Text(
-            text,
-            style: const TextStyle(color: Colors.black),
-          ),
+          title: Text(text, style: const TextStyle(color: Colors.black)),
           trailing: Container(
             decoration: BoxDecoration(
               color: const Color(0xFF5A76A9),
@@ -230,59 +246,71 @@ class _HomeProfessorScreenState extends State<HomeProfessorScreen> {
     );
   }
 
-Widget _buildMetaCard(
-  BuildContext context, {
-  required String title,
-}) {
-  return Opacity(
-    opacity: 0.4, // <- Isso deixa tudo "apagado"
-    child: Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFF000000),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 16,
-              color: Colors.white,
+  Widget _buildMetaCard(
+    BuildContext context, {
+    required String title,
+  }) {
+    return Opacity(
+      opacity: 0.4,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: const Color(0xFF000000),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(fontSize: 16, color: Colors.white),
             ),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFDDEF71),
-              foregroundColor: Colors.black,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(24),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFDDEF71),
+                foregroundColor: Colors.black,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(24),
+                ),
               ),
+              onPressed: null,
+              child: const Text('Ver mais'),
             ),
-            onPressed: null, // <- desabilita o botão
-            child: const Text('Ver mais'),
-          ),
-        ],
+          ],
+        ),
       ),
-    ),
-  );
-}
-
+    );
+  }
 
   Widget _buildPendingEvaluation({
     required String atividade,
     required String aluno,
+    required VoidCallback onTap,
   }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(atividade, style: const TextStyle(fontWeight: FontWeight.bold)),
-          Text('Aluno: $aluno'),
-        ],
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(atividade, style: const TextStyle(fontWeight: FontWeight.bold)),
+                  Text('Aluno: $aluno'),
+                ],
+              ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.rate_review, color: Color(0xFF5A76A9)),
+              tooltip: 'Avaliar atividade',
+              onPressed: onTap,
+            ),
+          ],
+        ),
       ),
     );
   }

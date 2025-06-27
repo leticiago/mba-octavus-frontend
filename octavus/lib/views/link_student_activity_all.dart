@@ -9,27 +9,31 @@ import '../models/dtos/assignactivityrequest.dart';
 import '../services/instrumentservice.dart';
 import '../services/professorservice.dart';
 
-class LinkActivityToStudentScreen extends StatefulWidget {
+class LinkActivityToStudentAllScreen extends StatefulWidget {
   final String professorId;
-  final Student student;
   final ProfessorService professorService;
   final void Function(int) onNavigate;
 
-  const LinkActivityToStudentScreen({
+  const LinkActivityToStudentAllScreen({
     super.key,
     required this.professorId,
-    required this.student,
     required this.professorService,
     required this.onNavigate,
   });
 
   @override
-  State<LinkActivityToStudentScreen> createState() => _LinkActivityToStudentScreenState();
+  State<LinkActivityToStudentAllScreen> createState() =>
+      _LinkActivityToStudentAllScreenState();
 }
 
-class _LinkActivityToStudentScreenState extends State<LinkActivityToStudentScreen> {
+class _LinkActivityToStudentAllScreenState
+    extends State<LinkActivityToStudentAllScreen> {
+  List<Student> students = [];
+  Student? selectedStudent;
+
   List<Instrument> instruments = [];
   Instrument? selectedInstrument;
+
   List<Activity> allActivities = [];
   List<Activity> filteredActivities = [];
   Activity? selectedActivity;
@@ -39,17 +43,21 @@ class _LinkActivityToStudentScreenState extends State<LinkActivityToStudentScree
   @override
   void initState() {
     super.initState();
-    _loadInstrumentsAndActivities();
+    _loadData();
   }
 
-  Future<void> _loadInstrumentsAndActivities() async {
+  Future<void> _loadData() async {
     try {
-      final instrs = await InstrumentService().getInstruments();
-      final acts = await widget.professorService.getActivitiesByProfessor(widget.professorId);
+      final fetchedStudents =
+          await widget.professorService.getStudentsByProfessor(widget.professorId);
+      final fetchedInstruments = await InstrumentService().getInstruments();
+      final fetchedActivities =
+          await widget.professorService.getActivitiesByProfessor(widget.professorId);
 
       setState(() {
-        instruments = instrs;
-        allActivities = acts;
+        students = fetchedStudents;
+        instruments = fetchedInstruments;
+        allActivities = fetchedActivities;
         isLoading = false;
       });
     } catch (e) {
@@ -74,6 +82,12 @@ class _LinkActivityToStudentScreenState extends State<LinkActivityToStudentScree
   }
 
   Future<void> _assignActivity() async {
+    if (selectedStudent == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Selecione um aluno')),
+      );
+      return;
+    }
     if (selectedActivity == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Selecione uma atividade para vincular')),
@@ -83,7 +97,7 @@ class _LinkActivityToStudentScreenState extends State<LinkActivityToStudentScree
 
     try {
       final request = AssignActivityRequest(
-        studentId: widget.student.id,
+        studentId: selectedStudent!.id,
         activityId: selectedActivity!.id!,
       );
       await widget.professorService.assignActivityToStudent(request);
@@ -99,6 +113,15 @@ class _LinkActivityToStudentScreenState extends State<LinkActivityToStudentScree
     }
   }
 
+  InputDecoration _inputDecoration(String label) {
+    return InputDecoration(
+      labelText: label,
+      filled: true,
+      fillColor: const Color(0xFFF0F5F5),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -107,44 +130,55 @@ class _LinkActivityToStudentScreenState extends State<LinkActivityToStudentScree
           ? const Center(child: CircularProgressIndicator())
           : SafeArea(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24),
+                padding: const EdgeInsets.all(20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Título e seta
                     Row(
                       children: [
                         IconButton(
                           icon: const Icon(Icons.arrow_back),
-                          onPressed: () => widget.onNavigate(3),
+                          onPressed: () => widget.onNavigate(0),
                         ),
-                        const Spacer(),
-                        const Text(
-                          'Vincular atividade',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
+                        const Expanded(
+                          child: Center(
+                            child: Text(
+                              'Vincular atividade',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ),
                         ),
-                        const Spacer(flex: 2),
+                        const SizedBox(width: 48),
                       ],
                     ),
-                    const SizedBox(height: 12),
-                    const Center(
-                      child: Text(
-                        'Vincule um exercício para que seu aluno pratique durante a semana.',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 14, color: Colors.black87),
-                      ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Selecione o aluno e a atividade para vincular.',
+                      style: TextStyle(fontSize: 16),
+                      textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 24),
 
+                    DropdownButtonFormField<Student>(
+                      decoration: _inputDecoration('Aluno'),
+                      items: students.map((student) {
+                        return DropdownMenuItem<Student>(
+                          value: student,
+                          child: Text(student.name),
+                        );
+                      }).toList(),
+                      value: selectedStudent,
+                      onChanged: (value) =>
+                          setState(() => selectedStudent = value),
+                    ),
+                    const SizedBox(height: 16),
+
                     DropdownButtonFormField<Instrument>(
-                      decoration: InputDecoration(
-                        labelText: 'Instrumento',
-                        filled: true,
-                        fillColor: const Color(0xFFF0F5F5),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                      ),
+                      decoration: _inputDecoration('Instrumento'),
                       items: instruments.map((inst) {
                         return DropdownMenuItem<Instrument>(
                           value: inst,
@@ -161,12 +195,7 @@ class _LinkActivityToStudentScreenState extends State<LinkActivityToStudentScree
 
                     if (filteredActivities.isNotEmpty)
                       DropdownButtonFormField<Activity>(
-                        decoration: InputDecoration(
-                          labelText: 'Atividade',
-                          filled: true,
-                          fillColor: const Color(0xFFF0F5F5),
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                        ),
+                        decoration: _inputDecoration('Atividade'),
                         items: filteredActivities.map((act) {
                           return DropdownMenuItem<Activity>(
                             value: act,
@@ -174,7 +203,8 @@ class _LinkActivityToStudentScreenState extends State<LinkActivityToStudentScree
                           );
                         }).toList(),
                         value: selectedActivity,
-                        onChanged: (value) => setState(() => selectedActivity = value),
+                        onChanged: (value) =>
+                            setState(() => selectedActivity = value),
                       ),
 
                     if (selectedActivity != null) ...[
@@ -182,26 +212,16 @@ class _LinkActivityToStudentScreenState extends State<LinkActivityToStudentScree
                       TextFormField(
                         readOnly: true,
                         initialValue: selectedActivity!.description,
-                        decoration: InputDecoration(
-                          labelText: 'Descrição',
-                          filled: true,
-                          fillColor: const Color(0xFFF0F5F5),
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                        ),
+                        decoration: _inputDecoration('Descrição'),
                       ),
                       const SizedBox(height: 16),
                       TextFormField(
                         readOnly: true,
-                        initialValue: DateFormat('dd/MM/yyyy').format(selectedActivity!.date),
-                        decoration: InputDecoration(
-                          labelText: 'Data da atividade',
-                          filled: true,
-                          fillColor: const Color(0xFFF0F5F5),
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                        ),
+                        initialValue: DateFormat('dd/MM/yyyy')
+                            .format(selectedActivity!.date),
+                        decoration: _inputDecoration('Data da atividade'),
                       ),
                     ],
-
 
                     const Spacer(),
 
@@ -215,7 +235,11 @@ class _LinkActivityToStudentScreenState extends State<LinkActivityToStudentScree
                         onPressed: _assignActivity,
                         child: const Text(
                           'Vincular >',
-                          style: TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.w600),
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                     ),

@@ -17,7 +17,29 @@ class _LoginScreenState extends State<LoginScreen> {
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
   final authService = AuthService();
+
   bool _isLoading = false;
+  String? loggedUserName;
+  bool isLoggedIn = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkSavedToken();
+  }
+
+  Future<void> _checkSavedToken() async {
+    final token = await TokenService.getToken();
+    if (token != null) {
+      final name = TokenService.extractNameFromToken(token);
+      if (name != null && name.isNotEmpty) {
+        setState(() {
+          loggedUserName = name;
+          isLoggedIn = true;
+        });
+      }
+    }
+  }
 
   Future<void> _login() async {
     setState(() => _isLoading = true);
@@ -34,6 +56,13 @@ class _LoginScreenState extends State<LoginScreen> {
     if (token != null) {
       await TokenService.saveToken(token);
 
+      final name = TokenService.extractNameFromToken(token);
+
+      setState(() {
+        loggedUserName = name;
+        isLoggedIn = true;
+      });
+
       final role = getRoleFromToken(token);
 
       if (role == 'Aluno') {
@@ -46,9 +75,14 @@ class _LoginScreenState extends State<LoginScreen> {
           context,
           MaterialPageRoute(builder: (_) => const MainScaffold(role: 'Professor')),
         );
-      }} else {
+      } else {
         Navigator.pushReplacementNamed(context, '/home-colaborador');
       }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Falha no login. Verifique usuário e senha.')),
+      );
+    }
   }
 
   void _navigateToSignUp() {
@@ -65,120 +99,149 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Center(child: Text("Olá,", style: TextStyle(fontSize: 20))),
-              const Center(
+              Center(
                 child: Text(
-                  "Bem-vindo de volta",
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  isLoggedIn
+                      ? 'Bem vindo de volta, $loggedUserName'
+                      : 'Olá,',
+                  style: const TextStyle(fontSize: 20),
                 ),
               ),
+              if (!isLoggedIn)
+                const Center(
+                  child: Text(
+                    "Bem-vindo de volta",
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                ),
+
               const SizedBox(height: 40),
 
-              TextFormField(
-                controller: usernameController,
-                decoration: InputDecoration(
-                  prefixIcon: const Icon(Icons.email_outlined),
-                  hintText: 'Username',
-                  filled: true,
-                  fillColor: const Color(0xFFEFF3F6),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              TextFormField(
-                controller: passwordController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  prefixIcon: const Icon(Icons.lock_outline),
-                  suffixIcon: const Icon(Icons.visibility_off_outlined),
-                  hintText: 'Senha',
-                  filled: true,
-                  fillColor: const Color(0xFFEFF3F6),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 8),
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: () {},
-                  child: const Text(
-                    'Esqueceu a senha?',
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 16),
-
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton.icon(
-                  onPressed: _isLoading ? null : _login,
-                  icon: const Icon(Icons.login, color: Colors.black),
-                  label: _isLoading
-                      ? const CircularProgressIndicator(color: Colors.black)
-                      : const Text("Entrar", style: TextStyle(color: Colors.black)),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFFFE48A),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
+              if (!isLoggedIn) ...[
+                TextFormField(
+                  controller: usernameController,
+                  decoration: InputDecoration(
+                    prefixIcon: const Icon(Icons.email_outlined),
+                    hintText: 'Username',
+                    filled: true,
+                    fillColor: const Color(0xFFEFF3F6),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
                     ),
                   ),
                 ),
-              ),
+                const SizedBox(height: 16),
 
-              const SizedBox(height: 24),
-              Row(
-                children: const [
-                  Expanded(child: Divider()),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 10),
-                    child: Text("Ou"),
+                TextFormField(
+                  controller: passwordController,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    prefixIcon: const Icon(Icons.lock_outline),
+                    suffixIcon: const Icon(Icons.visibility_off_outlined),
+                    hintText: 'Senha',
+                    filled: true,
+                    fillColor: const Color(0xFFEFF3F6),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
                   ),
-                  Expanded(child: Divider()),
-                ],
-              ),
+                ),
 
-              const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  IconButton(
-                    onPressed: () {},
-                    icon: const FaIcon(FontAwesomeIcons.facebookF),
-                  ),
-                  const SizedBox(width: 20),
-                  IconButton(
-                    onPressed: () {},
-                    icon: const FaIcon(FontAwesomeIcons.google),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text("Ainda não possui uma conta? "),
-                  GestureDetector(
-                    onTap: _navigateToSignUp,
+                const SizedBox(height: 8),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: () {
+                    },
                     child: const Text(
-                      "Crie agora",
-                      style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold),
+                      'Esqueceu a senha?',
+                      style: TextStyle(color: Colors.grey),
                     ),
-                  )
-                ],
-              )
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton.icon(
+                    onPressed: _isLoading ? null : _login,
+                    icon: const Icon(Icons.login, color: Colors.black),
+                    label: _isLoading
+                        ? const CircularProgressIndicator(color: Colors.black)
+                        : const Text("Entrar", style: TextStyle(color: Colors.black)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFFFE48A),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+                Row(
+                  children: const [
+                    Expanded(child: Divider()),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      child: Text("Ou"),
+                    ),
+                    Expanded(child: Divider()),
+                  ],
+                ),
+
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    IconButton(
+                      onPressed: () {},
+                      icon: const FaIcon(FontAwesomeIcons.facebookF),
+                    ),
+                    const SizedBox(width: 20),
+                    IconButton(
+                      onPressed: () {},
+                      icon: const FaIcon(FontAwesomeIcons.google),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text("Ainda não possui uma conta? "),
+                    GestureDetector(
+                      onTap: _navigateToSignUp,
+                      child: const Text(
+                        "Crie agora",
+                        style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold),
+                      ),
+                    )
+                  ],
+                )
+              ] else ...[
+               Padding(
+                  padding: const EdgeInsets.only(top: 40),
+                  child: Center(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => MainScaffold(role: 'Aluno'),
+                          ),
+                        );
+                      },
+                      child: const Text('Continuar'),
+                    ),
+                  ),
+                ),
+              ],
             ],
           ),
         ),
