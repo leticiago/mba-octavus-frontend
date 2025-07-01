@@ -1,112 +1,219 @@
 import 'package:flutter/material.dart';
+import '../services/tokenservice.dart';
+import '../services/user_session_service.dart';
+import '../services/studentservice.dart';
+import '../models/activitymodel.dart';
+import '../models/dtos/studentcompletedactivity.dart'; 
 
-class HomeAlunoScreen extends StatelessWidget {
-  const HomeAlunoScreen({super.key});
+class HomeAlunoScreen extends StatefulWidget {
+  final void Function(int) onNavigate;
+  const HomeAlunoScreen({super.key, required this.onNavigate});
+
+  @override
+  State<HomeAlunoScreen> createState() => _HomeAlunoScreenState();
+}
+
+class _HomeAlunoScreenState extends State<HomeAlunoScreen> {
+  String? userName;
+  bool _loadingUser = true;
+  bool _loadingActivities = true;
+
+  List<StudentCompletedActivity> completedActivities = [];
+
+  late final StudentService studentService;
+
+  @override
+  void initState() {
+    super.initState();
+    studentService = StudentService();
+    _loadUserName();
+  }
+
+  Future<void> _loadUserName() async {
+    final token = await TokenService.getToken();
+    if (token != null) {
+      final name = TokenService.extractNameFromToken(token);
+      setState(() {
+        userName = name;
+        _loadingUser = false;
+      });
+      await _loadCompletedActivities();
+    } else {
+      setState(() {
+        _loadingUser = false;
+        _loadingActivities = false;
+      });
+    }
+  }
+
+  Future<void> _loadCompletedActivities() async {
+    try {
+      final studentId = await UserSessionService.getUserId();
+      if (studentId != null) {
+        final activities = await studentService.getCompletedActivities(studentId);
+        setState(() {
+          completedActivities = activities;
+          _loadingActivities = false;
+        });
+      } else {
+        setState(() {
+          _loadingActivities = false;
+        });
+      }
+    } catch (e) {
+      print('Erro ao carregar atividades: $e');
+      setState(() {
+        _loadingActivities = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (_loadingUser || _loadingActivities) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
     return Scaffold(
-      backgroundColor: Color(0xFFF2F2F2),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 0,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: ""),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: ""),
-          BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: ""),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: ""),
+      backgroundColor: const Color(0xFFF5F5F5),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 16),
+              _buildIconCardButton("Minhas atividades", Icons.arrow_right,
+                  onTap: () {
+                widget.onNavigate(3);
+              }),
+              _buildProgressCard(),
+              const SizedBox(height: 12),
+              _buildMetaCard("Desbloquear metas"),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text("Atividades recentes",
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  GestureDetector(
+                    onTap: () {
+                    },
+                    child: const Text("Ver mais",
+                        style: TextStyle(color: Colors.blue)),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+
+              if (completedActivities.isEmpty)
+                const Text("Nenhuma atividade concluída encontrada."),
+              ...completedActivities
+                  .map((activity) => _buildRecentActivity(
+                      activity.title, "Pontuação: ${activity.score}"))
+                  .toList(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildIconCardButton(String text, IconData icon,
+      {VoidCallback? onTap}) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        decoration: BoxDecoration(
+          color: const Color(0xFFE7EDF8),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: ListTile(
+          title: Text(text),
+          trailing: Container(
+            decoration: BoxDecoration(
+              color: const Color(0xFF5A76A9),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: IconButton(
+              icon: Icon(icon, color: const Color(0xFFDDEF71)),
+              onPressed: onTap,
+            ),
+          ),
+          onTap: onTap,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProgressCard() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFDBE6F6),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text("Ver relatórios de progresso",
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFEFE08D),
+                  foregroundColor: Colors.black,
+                ),
+                onPressed: () {
+                },
+                child: const Text("Ver mais"),
+              ),
+              const Icon(Icons.pie_chart, size: 48, color: Colors.blueGrey),
+            ],
+          ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    );
+  }
+
+  Widget _buildMetaCard(String title) {
+    return Opacity(
+      opacity: 0.4,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.black,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            _roundedButton("Minhas atividades"),
-            const SizedBox(height: 12),
-            _progressCard(),
-            const SizedBox(height: 12),
-            _unlockGoalsButton(),
-            const SizedBox(height: 24),
-            const Text("Atividades recentes", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 12),
-            _recentActivity("Tríades", "Pontuação: 8.0"),
-            _recentActivity("Tétrades", "Pontuação: 5.0"),
+            Text(title, style: const TextStyle(color: Colors.white, fontSize: 16)),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFDDEF71),
+                foregroundColor: Colors.black,
+              ),
+              onPressed: null,
+              child: const Text("Ir"),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _roundedButton(String text) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Color(0xFFE0EFFF),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Text(text, style: TextStyle(fontSize: 16)),
-    );
-  }
-
-  Widget _progressCard() {
-    return Container(
-      height: 120,
-      decoration: BoxDecoration(
-        color: Color(0xFF203C60),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Stack(
-        children: [
-          Positioned(
-            top: 16,
-            left: 16,
-            child: Text("Ver relatórios de progresso",
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-            ),
-          ),
-          Positioned(
-            bottom: 16,
-            left: 16,
-            child: ElevatedButton(
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(backgroundColor: Color(0xFFEFE08D)),
-              child: const Text("Ver mais", style: TextStyle(color: Colors.black)),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _unlockGoalsButton() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Color(0xFF203C60),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          const Text("Desbloquear metas", style: TextStyle(color: Colors.white)),
-          ElevatedButton(
-            onPressed: () {},
-            style: ElevatedButton.styleFrom(backgroundColor: Color(0xFFEFE08D)),
-            child: const Text("Ir", style: TextStyle(color: Colors.black)),
-          )
-        ],
-      ),
-    );
-  }
-
-  Widget _recentActivity(String title, String score) {
+  Widget _buildRecentActivity(String title, String score) {
     return ListTile(
       contentPadding: EdgeInsets.zero,
-      title: Text(title),
+      title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
       subtitle: Text(score),
-      trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+      trailing: const Icon(Icons.check_circle, color: Colors.green),
     );
   }
 }

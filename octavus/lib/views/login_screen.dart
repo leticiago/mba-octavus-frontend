@@ -5,6 +5,7 @@ import '../models/LoginModel.dart';
 import '../services/TokenService.dart';
 import '../utils/JwtUtils.dart';
 import '../widgets/main_scaffold.dart';
+import '../widgets/main_scaffold_aluno.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -20,7 +21,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   bool _isLoading = false;
   String? loggedUserName;
-  bool isLoggedIn = false;
 
   @override
   void initState() {
@@ -35,7 +35,6 @@ class _LoginScreenState extends State<LoginScreen> {
       if (name != null && name.isNotEmpty) {
         setState(() {
           loggedUserName = name;
-          isLoggedIn = true;
         });
       }
     }
@@ -57,10 +56,8 @@ class _LoginScreenState extends State<LoginScreen> {
       await TokenService.saveToken(token);
 
       final name = TokenService.extractNameFromToken(token);
-
       setState(() {
         loggedUserName = name;
-        isLoggedIn = true;
       });
 
       final role = getRoleFromToken(token);
@@ -68,7 +65,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (role == 'Aluno') {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (_) => const MainScaffold(role: 'Aluno')),
+          MaterialPageRoute(builder: (_) => const MainScaffoldAluno()),
         );
       } else if (role == 'Professor') {
         Navigator.pushReplacement(
@@ -101,147 +98,121 @@ class _LoginScreenState extends State<LoginScreen> {
             children: [
               Center(
                 child: Text(
-                  isLoggedIn
-                      ? 'Bem vindo de volta, $loggedUserName'
-                      : 'Olá,',
-                  style: const TextStyle(fontSize: 20),
+                  loggedUserName != null
+                      ? 'Bem-vindo, $loggedUserName'
+                      : 'Olá!',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
               ),
-              if (!isLoggedIn)
-                const Center(
-                  child: Text(
-                    "Bem-vindo de volta",
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                ),
+              
 
               const SizedBox(height: 40),
 
-              if (!isLoggedIn) ...[
-                TextFormField(
-                  controller: usernameController,
-                  decoration: InputDecoration(
-                    prefixIcon: const Icon(Icons.email_outlined),
-                    hintText: 'Username',
-                    filled: true,
-                    fillColor: const Color(0xFFEFF3F6),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
+              TextFormField(
+                controller: usernameController,
+                decoration: InputDecoration(
+                  prefixIcon: const Icon(Icons.email_outlined),
+                  hintText: 'Username',
+                  filled: true,
+                  fillColor: const Color(0xFFEFF3F6),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              TextFormField(
+                controller: passwordController,
+                obscureText: true,
+                decoration: InputDecoration(
+                  prefixIcon: const Icon(Icons.lock_outline),
+                  suffixIcon: const Icon(Icons.visibility_off_outlined),
+                  hintText: 'Senha',
+                  filled: true,
+                  fillColor: const Color(0xFFEFF3F6),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 8),
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: () {},
+                  child: const Text(
+                    'Esqueceu a senha?',
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton.icon(
+                  onPressed: _isLoading ? null : _login,
+                  icon: const Icon(Icons.login, color: Colors.black),
+                  label: _isLoading
+                      ? const CircularProgressIndicator(color: Colors.black)
+                      : const Text("Entrar", style: TextStyle(color: Colors.black)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFFFE48A),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
+              ),
 
-                TextFormField(
-                  controller: passwordController,
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    prefixIcon: const Icon(Icons.lock_outline),
-                    suffixIcon: const Icon(Icons.visibility_off_outlined),
-                    hintText: 'Senha',
-                    filled: true,
-                    fillColor: const Color(0xFFEFF3F6),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
+              const SizedBox(height: 24),
+              Row(
+                children: const [
+                  Expanded(child: Divider()),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    child: Text("Ou"),
                   ),
-                ),
+                  Expanded(child: Divider()),
+                ],
+              ),
 
-                const SizedBox(height: 8),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: () {
-                    },
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    onPressed: () {},
+                    icon: const FaIcon(FontAwesomeIcons.facebookF),
+                  ),
+                  const SizedBox(width: 20),
+                  IconButton(
+                    onPressed: () {},
+                    icon: const FaIcon(FontAwesomeIcons.google),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text("Ainda não possui uma conta? "),
+                  GestureDetector(
+                    onTap: _navigateToSignUp,
                     child: const Text(
-                      'Esqueceu a senha?',
-                      style: TextStyle(color: Colors.grey),
+                      "Crie agora",
+                      style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold),
                     ),
-                  ),
-                ),
-
-                const SizedBox(height: 16),
-
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton.icon(
-                    onPressed: _isLoading ? null : _login,
-                    icon: const Icon(Icons.login, color: Colors.black),
-                    label: _isLoading
-                        ? const CircularProgressIndicator(color: Colors.black)
-                        : const Text("Entrar", style: TextStyle(color: Colors.black)),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFFFE48A),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 24),
-                Row(
-                  children: const [
-                    Expanded(child: Divider()),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      child: Text("Ou"),
-                    ),
-                    Expanded(child: Divider()),
-                  ],
-                ),
-
-                const SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    IconButton(
-                      onPressed: () {},
-                      icon: const FaIcon(FontAwesomeIcons.facebookF),
-                    ),
-                    const SizedBox(width: 20),
-                    IconButton(
-                      onPressed: () {},
-                      icon: const FaIcon(FontAwesomeIcons.google),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 24),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text("Ainda não possui uma conta? "),
-                    GestureDetector(
-                      onTap: _navigateToSignUp,
-                      child: const Text(
-                        "Crie agora",
-                        style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold),
-                      ),
-                    )
-                  ],
-                )
-              ] else ...[
-               Padding(
-                  padding: const EdgeInsets.only(top: 40),
-                  child: Center(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => MainScaffold(role: 'Aluno'),
-                          ),
-                        );
-                      },
-                      child: const Text('Continuar'),
-                    ),
-                  ),
-                ),
-              ],
+                  )
+                ],
+              ),
             ],
           ),
         ),

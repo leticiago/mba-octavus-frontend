@@ -4,9 +4,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../services/tokenservice.dart';
 import '../services/user_session_service.dart';
 import '../services/professorservice.dart';
+
+import '../models/studentmodel.dart';
+import '../views/home_student_screen.dart';
 import '../views/link_student_professor.dart';
 import '../views/manage_students.dart';
 import '../views/home_professor_screen.dart';
+import '../views/home_student_screen.dart';
 import '../views/initial_screen.dart';
 import '../views/professor_profile.dart';
 import '../views/create_activity_screen.dart';
@@ -15,7 +19,6 @@ import '../views/create_drag_and_drop_activity.dart';
 import '../views/create_free_text_activity.dart';
 import '../views/link_student_activity.dart';
 import '../views/link_student_activity_all.dart';
-import '../models/studentmodel.dart';
 import '../views/evaluate_activity_screen.dart';
 
 class MainScaffold extends StatefulWidget {
@@ -44,7 +47,6 @@ class _MainScaffoldState extends State<MainScaffold> {
   bool _hasError = false;
 
   Student? _selectedStudentId;
-
   String? _evaluateStudentId;
   String? _evaluateActivityId;
   String? _evaluateStudentResponse;
@@ -86,7 +88,6 @@ class _MainScaffoldState extends State<MainScaffold> {
   void _navigateTo(int index) {
     setState(() {
       _selectedIndex = index;
-
       if (index == 3) {
         final state = _gerenciarAlunosKey.currentState;
         if (state != null) {
@@ -103,7 +104,7 @@ class _MainScaffoldState extends State<MainScaffold> {
     setState(() {
       _evaluateStudentId = studentId;
       _evaluateActivityId = activityId;
-      _selectedIndex = 10; 
+      _selectedIndex = 10;
     });
   }
 
@@ -121,9 +122,11 @@ class _MainScaffoldState extends State<MainScaffold> {
       );
     }
 
-    final professorService = ProfessorService(
-      baseUrl: widget.baseUrl,
-    );
+    if (widget.role == 'Aluno') {
+      return HomeAlunoScreen(onNavigate: _navigateTo);
+    }
+
+    final professorService = ProfessorService(baseUrl: widget.baseUrl);
 
     final List<Widget> screens = [
       HomeProfessorScreen(
@@ -166,7 +169,7 @@ class _MainScaffoldState extends State<MainScaffold> {
         onNavigate: _navigateTo,
       ),
       LinkActivityToStudentAllScreen(
-        professorId: userId!, 
+        professorId: userId!,
         professorService: professorService,
         onNavigate: (index) => setState(() => _selectedIndex = index),
       ),
@@ -183,8 +186,7 @@ class _MainScaffoldState extends State<MainScaffold> {
               bottomRight: Radius.circular(20),
             ),
           ),
-          padding:
-              const EdgeInsets.only(top: 40, left: 20, right: 20, bottom: 10),
+          padding: const EdgeInsets.only(top: 40, left: 20, right: 20, bottom: 10),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
