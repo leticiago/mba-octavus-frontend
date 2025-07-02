@@ -110,12 +110,50 @@ class _HomeAlunoScreenState extends State<HomeAlunoScreen> {
               if (completedActivities.isEmpty)
                 const Text("Nenhuma atividade concluída encontrada."),
               ...completedActivities
-                  .map((activity) => _buildRecentActivity(
-                      activity.title, "Pontuação: ${activity.score}"))
-                  .toList(),
+              .map((activity) => _buildRecentActivity(activity))
+              .toList(),
+
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildRecentActivity(StudentCompletedActivity atividade) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFE3EAF6),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            atividade.title,
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            atividade.correctionDate != null
+                ? 'Corrigida em ${atividade.correctionDate!.toLocal().toString().split(' ')[0]}'
+                : 'Não corrigida',
+            style: const TextStyle(color: Colors.black54),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Pontuação: ${atividade.score?.toString() ?? 'N/A'}',
+            style: const TextStyle(color: Colors.black87),
+          ),
+          const SizedBox(height: 8),
+          const LinearProgressIndicator(
+            value: 1.0,
+            backgroundColor: Colors.grey,
+            color: Color(0xFF5A76A9),
+          ),
+        ],
       ),
     );
   }
@@ -205,15 +243,6 @@ class _HomeAlunoScreenState extends State<HomeAlunoScreen> {
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildRecentActivity(String title, String score) {
-    return ListTile(
-      contentPadding: EdgeInsets.zero,
-      title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-      subtitle: Text(score),
-      trailing: const Icon(Icons.check_circle, color: Colors.green),
     );
   }
 }

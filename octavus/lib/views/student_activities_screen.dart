@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import '../models/dtos/activitystudent.dart';
 import '../services/studentservice.dart';
 import '../services/user_session_service.dart';
-import '../models/dtos/activitystudent.dart';
+import 'student_question_and_answer.dart';
+import 'student_drag_and_drop.dart';
+import 'student_free_text.dart';
+
 
 class AlunoAtividadesScreen extends StatefulWidget {
   final void Function(int) onNavigate;
@@ -52,7 +56,26 @@ class _AlunoAtividadesScreenState extends State<AlunoAtividadesScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            _buildHeader(context),
+            _buildTopBar(),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back_ios),
+                    onPressed: () => widget.onNavigate(0),
+                  ),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Minhas atividades',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
             Expanded(
               child: atividades.isEmpty
                   ? const Center(child: Text("Nenhuma atividade disponível."))
@@ -71,40 +94,20 @@ class _AlunoAtividadesScreenState extends State<AlunoAtividadesScreen> {
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
+  Widget _buildTopBar() {
     return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       decoration: const BoxDecoration(
         color: Color(0xFF35456B),
         borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(24),
-          bottomRight: Radius.circular(24),
+          bottomLeft: Radius.circular(20),
+          bottomRight: Radius.circular(20),
         ),
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text('Olá, aluno',
-              style: TextStyle(color: Colors.white, fontSize: 18)),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
-                onPressed: () => widget.onNavigate(0),
-              ),
-              const SizedBox(width: 8),
-              const Text(
-                'Minhas atividades',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-        ],
+      child: const Text(
+        'Olá, aluno',
+        style: TextStyle(color: Colors.white, fontSize: 18),
       ),
     );
   }
@@ -130,36 +133,38 @@ class _AlunoAtividadesScreenState extends State<AlunoAtividadesScreen> {
             style: const TextStyle(color: Colors.black54),
           ),
           const SizedBox(height: 8),
-          Text(
-            atividade.isCorrected
-                ? 'Corrigida em ${atividade.correctionDate?.toLocal().toString().split(' ')[0]}'
-                : 'Não corrigida',
-            style: const TextStyle(color: Colors.black54),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'Pontuação: ${atividade.score?.toString() ?? 'N/A'}',
-            style: const TextStyle(color: Colors.black87),
-          ),
-          const SizedBox(height: 8),
-          LinearProgressIndicator(
-            value: _mapStatusToProgress(atividade.status),
-            backgroundColor: Colors.grey.shade300,
-            color: const Color(0xFF5A76A9),
-          ),
-          const SizedBox(height: 8),
           Align(
             alignment: Alignment.centerRight,
             child: IconButton(
               icon: const Icon(Icons.play_circle_outline, color: Colors.black54),
-              onPressed: () {
-                // Ação para iniciar ou revisar a atividade
-              },
+              onPressed: () => _abrirAtividade(atividade),
             ),
           ),
         ],
       ),
     );
+  }
+
+  void _abrirAtividade(ActivityStudent atividade) {
+    Widget tela;
+    switch (atividade.type) {
+      case 0:
+        tela = AtividadeQuestionarioScreen(activityId: atividade.activityId);
+        break;
+      case 1:
+        tela = AtividadeDragDropScreen(activityId: atividade.activityId);
+        break;
+      case 2:
+        tela = AtividadeTextoScreen(activityId: atividade.activityId);
+        break;
+      default:
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Tipo de atividade desconhecido")),
+        );
+        return;
+    }
+
+    Navigator.of(context).push(MaterialPageRoute(builder: (_) => tela));
   }
 
   double _mapStatusToProgress(ActivityStatus status) {

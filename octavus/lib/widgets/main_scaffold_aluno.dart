@@ -95,39 +95,38 @@ class _MainScaffoldAlunoState extends State<MainScaffoldAluno> {
         index: _selectedIndex,
         children: screens,
       ),
-      bottomNavigationBar: _selectedIndex <= 2
-          ? Container(
-              decoration: const BoxDecoration(
-                color: Color(0xFF35456B),
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
-                ),
-                boxShadow: [
-                  BoxShadow(color: Colors.black12, blurRadius: 8, offset: Offset(0, -2)),
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
-                ),
-                child: BottomNavigationBar(
-                  backgroundColor: const Color(0xFF35456B),
-                  currentIndex: _selectedIndex > 2 ? 0 : _selectedIndex,
-                  selectedItemColor: Colors.white,
-                  unselectedItemColor: Colors.white70,
-                  onTap: _navigateTo,
-                  type: BottomNavigationBarType.fixed,
-                  items: const [
-                    BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Início'),
-                    BottomNavigationBarItem(icon: Icon(Icons.assignment), label: 'Atividades'),
-                    BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
-                  ],
-                ),
-              ),
-            )
-          : null,
+      bottomNavigationBar: Container(
+  decoration: const BoxDecoration(
+    color: Color(0xFF35456B),
+    borderRadius: BorderRadius.only(
+      topLeft: Radius.circular(20),
+      topRight: Radius.circular(20),
+    ),
+    boxShadow: [
+      BoxShadow(color: Colors.black12, blurRadius: 8, offset: Offset(0, -2)),
+    ],
+  ),
+  child: ClipRRect(
+    borderRadius: const BorderRadius.only(
+      topLeft: Radius.circular(20),
+      topRight: Radius.circular(20),
+    ),
+    child: BottomNavigationBar(
+      backgroundColor: const Color(0xFF35456B),
+      currentIndex: _selectedIndex > 2 ? 0 : _selectedIndex,
+      selectedItemColor: Colors.white,
+      unselectedItemColor: Colors.white70,
+      onTap: _navigateTo,
+      type: BottomNavigationBarType.fixed,
+      items: const [
+        BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Início'),
+        BottomNavigationBarItem(icon: Icon(Icons.assignment), label: 'Atividades'),
+        BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
+      ],
+    ),
+  ),
+),
+
     );
   }
 }

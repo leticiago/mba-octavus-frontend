@@ -42,6 +42,7 @@ class ActivityStudent {
   final String comment;
   final bool isCorrected;
   final DateTime? correctionDate;
+  final int type;
 
   ActivityStudent({
     required this.activityId,
@@ -52,6 +53,7 @@ class ActivityStudent {
     required this.comment,
     required this.isCorrected,
     this.correctionDate,
+    required this.type
   });
 
   factory ActivityStudent.fromJson(Map<String, dynamic> json) {
@@ -66,6 +68,7 @@ class ActivityStudent {
       correctionDate: json['correctionDate'] != null
           ? DateTime.parse(json['correctionDate'])
           : null,
+      type: json['type']
     );
   }
 }
