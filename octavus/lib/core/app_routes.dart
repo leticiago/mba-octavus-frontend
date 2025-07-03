@@ -107,6 +107,7 @@ static Future<String?> _getSavedActivityId() async {
         );
 
       case '/criar-pergunta-resposta':
+      final args = settings.arguments as void Function(int)?;
       return MaterialPageRoute(
         builder: (_) => FutureBuilder<String?>(
           future: _getSavedActivityId(),
@@ -121,11 +122,15 @@ static Future<String?> _getSavedActivityId() async {
               );
             } else {
               final activityId = snapshot.data!;
-              return CreateQuestionAndAnswerActivityScreen(activityId: activityId);
+              return CreateQuestionAndAnswerActivityScreen(
+                activityId: activityId,
+                onNavigate: args,
+              );
             }
           },
         ),
       );
+
       case '/criar-arrasta-solta':
       return MaterialPageRoute(
         builder: (_) => FutureBuilder<String?>(

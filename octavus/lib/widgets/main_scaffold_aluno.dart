@@ -3,11 +3,16 @@ import '../services/tokenservice.dart';
 import '../views/home_student_screen.dart';
 import '../views/student_profile.dart';
 import '../views/student_activities_screen.dart';
+import '../views/student_question_and_answer.dart';
+import '../views/student_drag_and_drop.dart';
+import '../views/student_free_text.dart';
 
 class MainScaffoldAluno extends StatefulWidget {
   final int initialIndex;
+  final String? activityId;
 
-  const MainScaffoldAluno({Key? key, this.initialIndex = 0}) : super(key: key);
+  const MainScaffoldAluno({Key? key, this.initialIndex = 0, this.activityId}) : super(key: key);
+
 
   @override
   State<MainScaffoldAluno> createState() => _MainScaffoldAlunoState();
@@ -56,7 +61,10 @@ class _MainScaffoldAlunoState extends State<MainScaffoldAluno> {
       HomeAlunoScreen(onNavigate: _navigateTo),         
       const Center(child: Text('Atividades')),          
       PerfilAlunoScreen(onNavigate: _navigateTo),       
-      AlunoAtividadesScreen(onNavigate: _navigateTo),                          
+      AlunoAtividadesScreen(onNavigate: _navigateTo),   
+      AtividadeQuestionarioScreen(activityId: widget.activityId ?? '', onNavigate: _navigateTo),
+      AtividadeDragDropScreen(activityId: widget.activityId ?? ''),
+      AtividadeTextoScreen(activityId: widget.activityId ?? ''),                       
     ];
 
     return Scaffold(

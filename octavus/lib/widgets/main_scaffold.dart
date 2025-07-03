@@ -150,7 +150,7 @@ class _MainScaffoldState extends State<MainScaffold> {
       ),
       VincularAlunoScreen(onBack: () => _navigateTo(3)),
       CreateActivityScreen(onNavigate: _navigateTo),
-      CreateQuestionAndAnswerActivityScreen(activityId: activityId ?? ''),
+      CreateQuestionAndAnswerActivityScreen(activityId: activityId ?? '', onNavigate: _navigateTo),
       CreateDragAndDropActivityScreen(activityId: activityId ?? ''),
       CreateFreeTextActivityScreen(activityId: activityId ?? ''),
       _selectedStudentId != null

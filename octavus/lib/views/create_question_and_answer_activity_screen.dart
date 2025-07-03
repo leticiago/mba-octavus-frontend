@@ -4,10 +4,12 @@ import 'package:octavus/services/questionservice.dart';
 
 class CreateQuestionAndAnswerActivityScreen extends StatefulWidget {
   final String activityId;
+  final void Function(int)? onNavigate;
 
   const CreateQuestionAndAnswerActivityScreen({
     super.key,
     required this.activityId,
+    this.onNavigate
   });
 
   @override
@@ -50,6 +52,9 @@ class _CreateQuestionAndAnswerActivityScreenState
           ? 'Perguntas cadastradas com sucesso!'
           : 'Erro ao cadastrar perguntas.'),
     ));
+
+    if(success)
+       widget.onNavigate?.call(0);
   }
 
   @override

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import '../models/dtos/activitystudent.dart';
 import '../services/studentservice.dart';
+import '../services/questionservice.dart';
 import '../services/user_session_service.dart';
 import 'student_question_and_answer.dart';
 import 'student_drag_and_drop.dart';
 import 'student_free_text.dart';
+import '../widgets/main_scaffold_aluno.dart';
 
 
 class AlunoAtividadesScreen extends StatefulWidget {
@@ -20,6 +22,7 @@ class _AlunoAtividadesScreenState extends State<AlunoAtividadesScreen> {
   final StudentService studentService = StudentService();
   List<ActivityStudent> atividades = [];
   bool _loading = true;
+  final QuestionService questionService = QuestionService();
 
   @override
   void initState() {
@@ -38,7 +41,6 @@ class _AlunoAtividadesScreenState extends State<AlunoAtividadesScreen> {
         _loading = false;
       });
     } catch (e) {
-      print('Erro ao carregar atividades: $e');
       setState(() => _loading = false);
     }
   }
@@ -145,27 +147,43 @@ class _AlunoAtividadesScreenState extends State<AlunoAtividadesScreen> {
     );
   }
 
-  void _abrirAtividade(ActivityStudent atividade) {
-    Widget tela;
-    switch (atividade.type) {
-      case 0:
-        tela = AtividadeQuestionarioScreen(activityId: atividade.activityId);
-        break;
-      case 1:
-        tela = AtividadeDragDropScreen(activityId: atividade.activityId);
-        break;
-      case 2:
-        tela = AtividadeTextoScreen(activityId: atividade.activityId);
-        break;
-      default:
+ void _abrirAtividade(ActivityStudent atividade) async {
+  int targetIndex;
+
+  switch (atividade.type) {
+    case 0:
+      final questions = await QuestionService().getQuestionsByActivityId(atividade.activityId);
+      if (questions.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Tipo de atividade desconhecido")),
+          const SnackBar(content: Text("Esta atividade ainda não possui perguntas.")),
         );
         return;
-    }
-
-    Navigator.of(context).push(MaterialPageRoute(builder: (_) => tela));
+      }
+      targetIndex = 4;
+      break;
+    case 1:
+      targetIndex = 5;
+      break;
+    case 2:
+      targetIndex = 6;
+      break;
+    default:
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Tipo de atividade desconhecido")),
+      );
+      return;
   }
+
+  Navigator.of(context).pushReplacement(
+    MaterialPageRoute(
+      builder: (_) => MainScaffoldAluno(
+        initialIndex: targetIndex,
+        activityId: atividade.activityId,
+      ),
+    ),
+  );
+}
+
 
   double _mapStatusToProgress(ActivityStatus status) {
     switch (status) {

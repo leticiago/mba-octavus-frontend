@@ -57,4 +57,37 @@ class StudentService {
       throw Exception('Falha ao carregar atividades: ${response.statusCode}');
     }
   }
+
+    Future<Map<String, dynamic>> submitQuestionAndAnswer({
+      required String activityId,
+      required String studentId,
+      required List<Map<String, String>> answers,
+    }) async {
+      final token = await TokenService.getToken();
+      if (token == null) throw Exception('Token não encontrado');
+
+      final url = Uri.parse('$baseUrl/student/submit/question-and-answer');
+
+      final body = jsonEncode({
+        "activityId": activityId,
+        "studentId": studentId,
+        "answers": answers,
+      });
+
+      final response = await http.post(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: body,
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return jsonDecode(response.body); 
+      } else {
+        throw Exception('Erro ${response.statusCode}: ${response.body}');
+      }
+    }
+
 }

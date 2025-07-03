@@ -61,7 +61,6 @@ class _HomeAlunoScreenState extends State<HomeAlunoScreen> {
         });
       }
     } catch (e) {
-      print('Erro ao carregar atividades: $e');
       setState(() {
         _loadingActivities = false;
       });

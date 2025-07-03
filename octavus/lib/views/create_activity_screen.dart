@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 
 import '../models/activitymodel.dart';
 import '../models/instrumentmodel.dart';
@@ -90,6 +92,9 @@ class _CreateActivityScreenState extends State<CreateActivityScreen> {
 
       final service = ProfessorService(baseUrl: 'http://10.0.2.2:5277/api');
       final activityId = await service.createActivity(activity);
+
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('createdActivityId', activityId);
 
       switch (_type) {
         case 0:

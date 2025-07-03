@@ -103,4 +103,38 @@ class QuestionService {
 
     return response.statusCode == 200 || response.statusCode == 201;
   }
+
+  Future<List<dynamic>> getQuestionsByActivityId(String activityId) async {
+  final token = await TokenService.getToken();
+  if (token == null) {
+    throw Exception('Token de autenticação não encontrado');
+  }
+
+  final url = Uri.parse('$baseUrl/api/question/activity/$activityId');
+
+  final response = await http.get(
+    url,
+    headers: {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+    },
+  );
+
+  if (response.statusCode == 200) {
+    try {
+      final decoded = jsonDecode(response.body);
+      if (decoded is List) {
+        return decoded;
+      } else {
+        throw Exception('Resposta inesperada: não é uma lista');
+      }
+    } catch (e) {
+      throw Exception('Erro ao fazer parsing da resposta: $e');
+    }
+  } else {
+    throw Exception('Erro ao buscar perguntas da atividade: ${response.body}');
+  }
+}
+
+
 }
