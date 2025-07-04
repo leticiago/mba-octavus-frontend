@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/forms/question_form_data.dart';
 import 'tokenservice.dart';
+import '../models/opentextquestionmodel.dart';
 
 class QuestionService {
   final String baseUrl = 'http://10.0.2.2:5277';
@@ -149,6 +150,27 @@ class QuestionService {
       return jsonDecode(response.body);
     } else {
       throw Exception('Erro ao buscar opções de drag and drop');
+    }
+  }
+
+  Future<OpenTextQuestionModel> getOpenTextActivity(String activityId) async {
+    final token = await TokenService.getToken();
+    final url = Uri.parse('$baseUrl/api/opentext/question/$activityId');
+
+    final response = await http.get(url, headers: {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+    });
+
+    if (response.statusCode == 200) {
+      final List data = jsonDecode(response.body);
+      if (data.isNotEmpty) {
+        return OpenTextQuestionModel.fromJson(data.first);
+      } else {
+        throw Exception('Nenhuma pergunta encontrada.');
+      }
+    } else {
+      throw Exception('Erro ao buscar atividade: ${response.statusCode}');
     }
   }
 

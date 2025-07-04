@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import '../services/tokenservice.dart';
 import '../models/dtos/studentcompletedactivity.dart';
 import '../models/dtos/activitystudent.dart';
+import 'package:uuid/uuid.dart';
 
 class StudentService {
   final String baseUrl;
@@ -111,5 +112,41 @@ class StudentService {
 
     return response.statusCode == 200;
   }
+
+Future<bool> submitOpenTextAnswer({
+  required String questionId,
+  required String studentId,
+  required String responseText,
+}) async {
+  final token = await TokenService.getToken();
+  if (token == null) throw Exception('Token de autenticação não encontrado');
+
+  final url = Uri.parse('$baseUrl/opentext/answer');
+
+  final uuid = const Uuid().v4(); 
+
+  final body = jsonEncode({
+    "id": uuid,
+    "questionId": questionId,
+    "studentId": studentId,
+    "responseText": responseText,
+    "submittedAt": DateTime.now().toIso8601String(),
+  });
+
+  final response = await http.post(
+    url,
+    headers: {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+    },
+    body: body,
+  );
+
+  if (response.statusCode == 200 || response.statusCode == 201) {
+    return true;
+  } else {
+    throw Exception('Erro ao enviar resposta: ${response.statusCode} - ${response.body}');
+  }
+}
 
 }
