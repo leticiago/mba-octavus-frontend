@@ -90,4 +90,26 @@ class StudentService {
       }
     }
 
+    Future<bool> submitDragAndDropAnswer({
+    required String activityId,
+    required String studentId,
+    required List<String> orderedOptions,
+  }) async {
+    final token = await TokenService.getToken();
+    final url = Uri.parse('$baseUrl/student/submit/drag-and-drop');
+
+    final body = jsonEncode({
+      'activityId': activityId,
+      'studentId': studentId,
+      'answer': orderedOptions.join(';'),
+    });
+
+    final response = await http.post(url, headers: {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+    }, body: body);
+
+    return response.statusCode == 200;
+  }
+
 }

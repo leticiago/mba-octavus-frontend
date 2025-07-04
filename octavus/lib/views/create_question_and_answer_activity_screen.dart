@@ -9,7 +9,7 @@ class CreateQuestionAndAnswerActivityScreen extends StatefulWidget {
   const CreateQuestionAndAnswerActivityScreen({
     super.key,
     required this.activityId,
-    this.onNavigate
+    this.onNavigate,
   });
 
   @override
@@ -24,14 +24,14 @@ class _CreateQuestionAndAnswerActivityScreenState
   final List<QuestionFormData> questions = [QuestionFormData()];
 
   final _formKey = GlobalKey<FormState>();
-  final String baseUrl = 'http://10.0.2.2:5277';
 
   void updateNumberOfQuestions(int value) {
     setState(() {
       numberOfQuestions = value;
       if (questions.length < value) {
-        questions.addAll(List.generate(
-            value - questions.length, (_) => QuestionFormData()));
+        questions.addAll(
+          List.generate(value - questions.length, (_) => QuestionFormData()),
+        );
       } else {
         questions.removeRange(value, questions.length);
       }
@@ -47,14 +47,18 @@ class _CreateQuestionAndAnswerActivityScreenState
       questions: questions,
     );
 
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(success
-          ? 'Perguntas cadastradas com sucesso!'
-          : 'Erro ao cadastrar perguntas.'),
-    ));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          success
+              ? 'Perguntas cadastradas com sucesso!'
+              : 'Erro ao cadastrar perguntas.',
+        ),
+        backgroundColor: success ? Colors.green : Colors.red,
+      ),
+    );
 
-    if(success)
-       widget.onNavigate?.call(0);
+    if (success) widget.onNavigate?.call(0);
   }
 
   @override
@@ -77,11 +81,11 @@ class _CreateQuestionAndAnswerActivityScreenState
                         onPressed: () => Navigator.pop(context),
                       ),
                     ),
-
                     const SizedBox(height: 4),
                     const Text(
                       'Cadastrar Pergunta–Resposta',
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 4),
                     const Text(
@@ -89,19 +93,15 @@ class _CreateQuestionAndAnswerActivityScreenState
                       style: TextStyle(fontSize: 14, color: Colors.black54),
                     ),
                     const SizedBox(height: 20),
-
                     _buildDropdownQtd(),
-
                     const SizedBox(height: 20),
                     for (int i = 0; i < numberOfQuestions; i++)
                       _buildQuestionCard(i),
-
                     const SizedBox(height: 100),
                   ],
                 ),
               ),
             ),
-
             Positioned(
               bottom: 20,
               left: 24,
@@ -120,7 +120,7 @@ class _CreateQuestionAndAnswerActivityScreenState
                   ),
                   onPressed: _submit,
                   child: const Text(
-                    'Cadastrar  >',
+                    'Cadastrar >',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,

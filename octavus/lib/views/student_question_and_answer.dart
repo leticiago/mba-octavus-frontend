@@ -39,9 +39,9 @@ class _AtividadeQuestionarioScreenState extends State<AtividadeQuestionarioScree
     setState(() {
       isLoading = false;
     });
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Erro ao carregar perguntas.')),
-    );
+    // ScaffoldMessenger.of(context).showSnackBar(
+    //   const SnackBar(content: Text('Erro ao carregar perguntas.')),
+    // );
   }
 }
 

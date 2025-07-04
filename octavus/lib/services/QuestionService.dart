@@ -136,5 +136,21 @@ class QuestionService {
   }
 }
 
+  Future<Map<String, dynamic>> getDragAndDropOptions(String activityId) async {
+    final token = await TokenService.getToken();
+    final url = Uri.parse('$baseUrl/api/draganddrop/$activityId');
+
+    final response = await http.get(url, headers: {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+    });
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Erro ao buscar opções de drag and drop');
+    }
+  }
+
 
 }

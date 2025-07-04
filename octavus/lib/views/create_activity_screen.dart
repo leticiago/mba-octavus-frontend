@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
 
 import '../models/activitymodel.dart';
 import '../models/instrumentmodel.dart';
 import '../services/instrumentservice.dart';
 import '../services/professorservice.dart';
 import '../services/user_session_service.dart';
+import 'create_drag_and_drop_activity.dart';
 
 class CreateActivityScreen extends StatefulWidget {
   final void Function(int) onNavigate;
@@ -93,9 +92,6 @@ class _CreateActivityScreenState extends State<CreateActivityScreen> {
       final service = ProfessorService(baseUrl: 'http://10.0.2.2:5277/api');
       final activityId = await service.createActivity(activity);
 
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('createdActivityId', activityId);
-
       switch (_type) {
         case 0:
           widget.onNavigate(6);
@@ -104,7 +100,7 @@ class _CreateActivityScreenState extends State<CreateActivityScreen> {
           widget.onNavigate(7);
           break;
         case 2:
-          widget.onNavigate(8);
+          widget.onNavigate(8); 
           break;
         default:
           widget.onNavigate(0);

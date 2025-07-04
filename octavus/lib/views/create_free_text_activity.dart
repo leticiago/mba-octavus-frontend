@@ -3,10 +3,12 @@ import '../services/questionservice.dart';
 
 class CreateFreeTextActivityScreen extends StatefulWidget {
   final String activityId;
+  final void Function(int)? onNavigate;
 
   const CreateFreeTextActivityScreen({
     super.key,
     required this.activityId,
+    this.onNavigate,
   });
 
   @override
@@ -49,7 +51,13 @@ class _CreateFreeTextActivityScreenState
         backgroundColor: success ? Colors.green : Colors.red,
       ));
 
-      if (success) Navigator.pop(context);
+      if (success) {
+        if (widget.onNavigate != null) {
+          widget.onNavigate!(0);
+        } else {
+          Navigator.pop(context);
+        }
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Erro: $e'),
@@ -108,7 +116,8 @@ class _CreateFreeTextActivityScreenState
                   key: _formKey,
                   child: ListView(
                     children: [
-                      _buildTextField(controller: _titleController, label: 'Título'),
+                      _buildTextField(
+                          controller: _titleController, label: 'Título'),
                       const SizedBox(height: 12),
                       _buildTextField(
                         controller: _descriptionController,
@@ -141,7 +150,8 @@ class _CreateFreeTextActivityScreenState
                       ? const CircularProgressIndicator(color: Colors.black)
                       : const Text(
                           'Cadastrar >',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
                         ),
                 ),
               ),

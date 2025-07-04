@@ -3,10 +3,12 @@ import '../services/questionservice.dart';
 
 class CreateDragAndDropActivityScreen extends StatefulWidget {
   final String activityId;
+  final void Function(int)? onNavigate;
 
   const CreateDragAndDropActivityScreen({
     super.key,
     required this.activityId,
+    this.onNavigate,
   });
 
   @override
@@ -47,7 +49,13 @@ class _CreateDragAndDropActivityScreenState
         backgroundColor: success ? Colors.green : Colors.red,
       ));
 
-      if (success) Navigator.pop(context);
+      if (success) {
+        if (widget.onNavigate != null) {
+          widget.onNavigate!(0);
+        } else {
+          Navigator.pop(context);
+        }
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Erro: $e'),
@@ -63,26 +71,47 @@ class _CreateDragAndDropActivityScreenState
     return Scaffold(
       backgroundColor: const Color(0xFFF9F9F9),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              IconButton(
-                icon: const Icon(Icons.arrow_back, color: Colors.black),
-                onPressed: () => Navigator.pop(context),
+        child: Column(
+          children: [
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              decoration: const BoxDecoration(
+                color: Color(0xFF35456B),
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(20),
+                  bottomRight: Radius.circular(20),
+                ),
               ),
-              const Text(
-                'Cadastrar Arrasta-e-Solta',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              child: const Text(
+                'Olá, professor',
+                style: TextStyle(color: Colors.white, fontSize: 18),
               ),
-              const SizedBox(height: 6),
-              const Text(
-                'Digite a instrução e as opções separadas por ponto e vírgula.',
-                style: TextStyle(fontSize: 14, color: Colors.black54),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back, color: Colors.black),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                  const Text(
+                    'Cadastrar Arrasta-e-Solta',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 6),
+                  const Text(
+                    'Digite a instrução e as opções separadas por ponto e vírgula.',
+                    style: TextStyle(fontSize: 14, color: Colors.black54),
+                  ),
+                ],
               ),
-              const SizedBox(height: 20),
-              Expanded(
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Form(
                   key: _formKey,
                   child: ListView(
@@ -114,8 +143,11 @@ class _CreateDragAndDropActivityScreenState
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
-              SizedBox(
+            ),
+            const SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: SizedBox(
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton(
@@ -135,8 +167,9 @@ class _CreateDragAndDropActivityScreenState
                         ),
                 ),
               ),
-            ],
-          ),
+            ),
+            const SizedBox(height: 16),
+          ],
         ),
       ),
     );

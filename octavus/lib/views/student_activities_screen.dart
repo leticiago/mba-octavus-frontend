@@ -174,7 +174,7 @@ class _AlunoAtividadesScreenState extends State<AlunoAtividadesScreen> {
       return;
   }
 
-  Navigator.of(context).pushReplacement(
+  Navigator.of(context).push(
     MaterialPageRoute(
       builder: (_) => MainScaffoldAluno(
         initialIndex: targetIndex,
