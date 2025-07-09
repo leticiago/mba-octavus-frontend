@@ -7,7 +7,7 @@ class Activity {
   final int level;
   final bool isPublic;
   final String instrumentId;
-  final String professorId;
+  final String? professorId;
 
   Activity({
     this.id,
@@ -18,7 +18,7 @@ class Activity {
     required this.level,
     required this.isPublic,
     required this.instrumentId,
-    required this.professorId,
+    this.professorId,
   });
 
  factory Activity.fromJson(Map<String, dynamic> json) {

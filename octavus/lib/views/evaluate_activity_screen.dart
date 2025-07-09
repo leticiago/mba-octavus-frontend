@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
 import '../services/professorservice.dart';
+import '../services/studentservice.dart';
+import '../models/opentextanswermodel.dart';
 
 class EvaluateActivityScreen extends StatefulWidget {
+  final ProfessorService professorService;
+  final StudentService studentService;
+  final void Function(int) onNavigate;
   final String studentId;
   final String activityId;
-  final String studentResponse;
-  final ProfessorService professorService;
-  final void Function(int) onNavigate;
 
   const EvaluateActivityScreen({
     super.key,
     required this.studentId,
     required this.activityId,
-    required this.studentResponse,
     required this.professorService,
+    required this.studentService,
     required this.onNavigate,
   });
 
@@ -26,6 +28,44 @@ class _EvaluateActivityScreenState extends State<EvaluateActivityScreen> {
   final TextEditingController _commentController = TextEditingController();
   bool _isSubmitting = false;
 
+  OpenTextAnswer? _answer;
+  bool _isLoading = true;
+
+  String? _studentId;
+  String? _activityId;
+
+  @override
+  void initState() {
+  super.initState();
+
+  _loadAnswer(widget.studentId, widget.activityId);
+  }
+
+  Future<void> _loadAnswer(String studentId, String activityId) async {
+  print('Iniciando _loadAnswer');
+
+  try {
+    print('Chamando getOpenTextAnswer...');
+    final fetchedAnswer = await widget.studentService.getOpenTextAnswer(
+      activityId: activityId,
+      studentId: studentId,
+    );
+    print('Resposta recebida: $fetchedAnswer');
+
+    setState(() {
+      _answer = fetchedAnswer;
+      _isLoading = false;
+    });
+  } catch (e) {
+    print('Erro no _loadAnswer: $e');
+    setState(() => _isLoading = false);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Erro ao carregar resposta: $e')),
+    );
+  }
+}
+
+
   Future<void> _submitEvaluation() async {
     final score = int.tryParse(_scoreController.text);
     final comment = _commentController.text;
@@ -33,6 +73,13 @@ class _EvaluateActivityScreenState extends State<EvaluateActivityScreen> {
     if (score == null || score < 0 || score > 10) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Nota deve ser entre 0 e 10')),
+      );
+      return;
+    }
+
+    if (widget.studentId.isEmpty || widget.activityId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Dados da avaliação não encontrados')),
       );
       return;
     }
@@ -105,12 +152,15 @@ class _EvaluateActivityScreenState extends State<EvaluateActivityScreen> {
               ),
               const SizedBox(height: 24),
 
-              TextFormField(
-                initialValue: widget.studentResponse,
-                readOnly: true,
-                maxLines: 3,
-                decoration: _inputDecoration('Resposta do aluno', icon: Icons.chat_bubble_outline),
-              ),
+              _isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : TextFormField(
+                      initialValue: _answer?.responseText ?? 'Nenhuma resposta encontrada.',
+                      readOnly: true,
+                      maxLines: 3,
+                      decoration: _inputDecoration('Resposta do aluno', icon: Icons.chat_bubble_outline),
+                    ),
+
               const SizedBox(height: 16),
 
               TextFormField(

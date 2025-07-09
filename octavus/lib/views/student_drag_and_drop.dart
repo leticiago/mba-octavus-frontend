@@ -47,43 +47,47 @@ class _AtividadeDragDropScreenState extends State<AtividadeDragDropScreen> {
   }
 
   Future<void> enviarResposta() async {
-    final studentId = await UserSessionService.getUserId();
-    if (studentId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Aluno não identificado.')),
-      );
-      return;
-    }
+  final studentId = await UserSessionService.getUserId();
+  if (studentId == null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Aluno não identificado.')),
+    );
+    return;
+  }
 
-    final sucesso = await StudentService().submitDragAndDropAnswer(
+  try {
+    final result = await StudentService().submitDragAndDropAnswer(
       activityId: widget.activityId,
       studentId: studentId,
       orderedOptions: opcoes,
     );
 
-    if (sucesso) {
-      showDialog(
-        context: context,
-        builder: (_) => AlertDialog(
-          title: const Text('Resposta enviada'),
-          content: const Text('Sua resposta foi registrada com sucesso.'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                Navigator.of(context).pop();
-              },
-              child: const Text('OK'),
-            ),
-          ],
-        ),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Erro ao enviar resposta.')),
-      );
-    }
+    final String message = result['message'] ?? 'Resposta enviada com sucesso.';
+    final double score = (result['score'] as num?)?.toDouble() ?? 0.0;
+
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Resultado'),
+        content: Text('$message\nPontuação: $score'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(); 
+              Navigator.of(context).pop(); 
+            },
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Erro ao enviar resposta: $e')),
+    );
   }
+}
+
 
   Widget _buildTopBar() {
     return Container(

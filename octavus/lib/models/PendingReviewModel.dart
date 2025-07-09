@@ -1,23 +1,23 @@
 class PendingReview {
-  final String atividade;
-  final String atividadeId;
-  final String aluno;
-  final String alunoId;
+  final String activity;
+  final String activityId;
+  final String student;
+  final String studentId;
   
 
   PendingReview({
-    required this.atividade,
-    required this.aluno,
-    required this.atividadeId,
-    required this.alunoId,
+    required this.activity,
+    required this.student,
+    required this.activityId,
+    required this.studentId,
   });
 
   factory PendingReview.fromJson(Map<String, dynamic> json) {
     return PendingReview(
-      atividade: json['activityName'] ?? '',
-      aluno: json['studentName'] ?? '',
-      alunoId: json['studentId'] ?? '',
-      atividadeId: json['activityId'] ?? '', 
+      activity: json['activityName'] ?? '',
+      student: json['studentName'] ?? '',
+      studentId: json['studentId'] ?? '',
+      activityId: json['activityId'] ?? '', 
     );
   }
 }

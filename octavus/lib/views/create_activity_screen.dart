@@ -6,14 +6,13 @@ import '../models/instrumentmodel.dart';
 import '../services/instrumentservice.dart';
 import '../services/professorservice.dart';
 import '../services/user_session_service.dart';
-import 'create_drag_and_drop_activity.dart';
 
 class CreateActivityScreen extends StatefulWidget {
-  final void Function(int) onNavigate;
+  final void Function(int pageIndex, String activityId) onNavigateWithId;
 
   const CreateActivityScreen({
     super.key,
-    required this.onNavigate,
+    required this.onNavigateWithId,
   });
 
   @override
@@ -94,16 +93,16 @@ class _CreateActivityScreenState extends State<CreateActivityScreen> {
 
       switch (_type) {
         case 0:
-          widget.onNavigate(6);
+          widget.onNavigateWithId(6, activityId);
           break;
         case 1:
-          widget.onNavigate(7);
+          widget.onNavigateWithId(7, activityId);
           break;
         case 2:
-          widget.onNavigate(8); 
+          widget.onNavigateWithId(8, activityId);
           break;
         default:
-          widget.onNavigate(0);
+          widget.onNavigateWithId(0, '');
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

@@ -6,13 +6,13 @@ import '../views/student_activities_screen.dart';
 import '../views/student_question_and_answer.dart';
 import '../views/student_drag_and_drop.dart';
 import '../views/student_free_text.dart';
+import '../views/public_activities_screen.dart';
 
 class MainScaffoldAluno extends StatefulWidget {
   final int initialIndex;
   final String? activityId;
 
   const MainScaffoldAluno({Key? key, this.initialIndex = 0, this.activityId}) : super(key: key);
-
 
   @override
   State<MainScaffoldAluno> createState() => _MainScaffoldAlunoState();
@@ -23,11 +23,37 @@ class _MainScaffoldAlunoState extends State<MainScaffoldAluno> {
   String? userName;
   bool _loading = true;
 
+  final List<Widget?> screens = List.filled(7, null); // agora começa vazio
+
   @override
   void initState() {
     super.initState();
     _selectedIndex = widget.initialIndex;
     _loadUserInfo();
+    _initScreens();
+  }
+
+  void _initScreens() {
+    screens[0] = HomeAlunoScreen(onNavigate: _navigateTo);
+    screens[1] = PublicActivityScreen(onNavigate: _navigateTo);
+    screens[2] = PerfilAlunoScreen(onNavigate: _navigateTo);
+    screens[3] = AlunoAtividadesScreen(onNavigate: _navigateTo);
+    if (_selectedIndex >= 4 && widget.activityId != null) {
+      switch (_selectedIndex) {
+        case 4:
+          screens[4] = AtividadeQuestionarioScreen(
+            activityId: widget.activityId!,
+            onNavigate: _navigateTo,
+          );
+          break;
+        case 5:
+          screens[5] = AtividadeDragDropScreen(activityId: widget.activityId!);
+          break;
+        case 6:
+          screens[6] = AtividadeTextoScreen(activityId: widget.activityId!);
+          break;
+      }
+    }
   }
 
   Future<void> _loadUserInfo() async {
@@ -45,9 +71,30 @@ class _MainScaffoldAlunoState extends State<MainScaffoldAluno> {
     }
   }
 
-  void _navigateTo(int index) {
+  void _navigateTo(int index, {String? activityId}) {
     setState(() {
       _selectedIndex = index;
+
+      if (index == 1) {
+        screens[1] = PublicActivityScreen(onNavigate: _navigateTo);
+      }
+
+      if (index >= 4 && activityId != null) {
+        switch (index) {
+          case 4:
+            screens[4] = AtividadeQuestionarioScreen(
+              activityId: activityId,
+              onNavigate: _navigateTo,
+            );
+            break;
+          case 5:
+            screens[5] = AtividadeDragDropScreen(activityId: activityId);
+            break;
+          case 6:
+            screens[6] = AtividadeTextoScreen(activityId: activityId);
+            break;
+        }
+      }
     });
   }
 
@@ -56,16 +103,6 @@ class _MainScaffoldAlunoState extends State<MainScaffoldAluno> {
     if (_loading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
-
-    final List<Widget> screens = [
-      HomeAlunoScreen(onNavigate: _navigateTo),         
-      const Center(child: Text('Atividades')),          
-      PerfilAlunoScreen(onNavigate: _navigateTo),       
-      AlunoAtividadesScreen(onNavigate: _navigateTo),   
-      AtividadeQuestionarioScreen(activityId: widget.activityId ?? '', onNavigate: _navigateTo),
-      AtividadeDragDropScreen(activityId: widget.activityId ?? ''),
-      AtividadeTextoScreen(activityId: widget.activityId ?? ''),                       
-    ];
 
     return Scaffold(
       appBar: _selectedIndex > 2
@@ -80,8 +117,7 @@ class _MainScaffoldAlunoState extends State<MainScaffoldAluno> {
                     bottomRight: Radius.circular(20),
                   ),
                 ),
-                padding: const EdgeInsets.only(
-                    top: 40, left: 20, right: 20, bottom: 10),
+                padding: const EdgeInsets.only(top: 40, left: 20, right: 20, bottom: 10),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -93,15 +129,17 @@ class _MainScaffoldAlunoState extends State<MainScaffoldAluno> {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    const Icon(Icons.account_circle_outlined,
-                        color: Colors.white, size: 28),
+                    const Icon(Icons.account_circle_outlined, color: Colors.white, size: 28),
                   ],
                 ),
               ),
             ),
       body: IndexedStack(
         index: _selectedIndex,
-        children: screens,
+        children: List.generate(
+          screens.length,
+          (i) => screens[i] ?? const SizedBox.shrink(), // evita erro null
+        ),
       ),
       bottomNavigationBar: Container(
   decoration: const BoxDecoration(
@@ -121,20 +159,22 @@ class _MainScaffoldAlunoState extends State<MainScaffoldAluno> {
     ),
     child: BottomNavigationBar(
       backgroundColor: const Color(0xFF35456B),
-      currentIndex: _selectedIndex > 2 ? 0 : _selectedIndex,
+      currentIndex: _selectedIndex > 3 ? 0 : _selectedIndex, 
       selectedItemColor: Colors.white,
       unselectedItemColor: Colors.white70,
-      onTap: _navigateTo,
+      onTap: (index) {
+        if (index == _selectedIndex) return;
+        _navigateTo(index);
+      },
       type: BottomNavigationBarType.fixed,
       items: const [
         BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Início'),
         BottomNavigationBarItem(icon: Icon(Icons.assignment), label: 'Atividades'),
         BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
-      ],
-    ),
-  ),
-),
-
+                  ],
+                ),
+              ),
+            )
     );
   }
 }

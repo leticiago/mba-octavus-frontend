@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:octavus/views/public_activities_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../services/tokenservice.dart';
 import '../services/user_session_service.dart';
 import '../services/professorservice.dart';
+import '../services/studentservice.dart';
 
 import '../models/studentmodel.dart';
 import '../views/home_student_screen.dart';
 import '../views/link_student_professor.dart';
 import '../views/manage_students.dart';
 import '../views/home_professor_screen.dart';
-import '../views/home_student_screen.dart';
-import '../views/initial_screen.dart';
 import '../views/professor_profile.dart';
 import '../views/create_activity_screen.dart';
 import '../views/create_question_and_answer_activity_screen.dart';
@@ -20,6 +20,7 @@ import '../views/create_free_text_activity.dart';
 import '../views/link_student_activity.dart';
 import '../views/link_student_activity_all.dart';
 import '../views/evaluate_activity_screen.dart';
+import '../views/public_activities_screen.dart';
 
 class MainScaffold extends StatefulWidget {
   final String role;
@@ -51,8 +52,14 @@ class _MainScaffoldState extends State<MainScaffold> {
   String? _evaluateActivityId;
   String? _evaluateStudentResponse;
 
+  late ProfessorService professorService;
+  late StudentService studentService;
+
   final GlobalKey<State<GerenciarAlunosScreen>> _gerenciarAlunosKey =
       GlobalKey<State<GerenciarAlunosScreen>>();
+
+  String? createdActivityId;
+
 
   @override
   void initState() {
@@ -97,15 +104,29 @@ class _MainScaffoldState extends State<MainScaffold> {
     });
   }
 
-  void _openEvaluateActivity({
-    required String studentId,
-    required String activityId,
-  }) {
+    void _navigateToWithActivityId(int index, String activityId) {
     setState(() {
-      _evaluateStudentId = studentId;
-      _evaluateActivityId = activityId;
-      _selectedIndex = 10;
+      createdActivityId = activityId;
+      _selectedIndex = index;
     });
+  }
+
+  Future<void> _openEvaluateActivity({
+  required String studentId,
+  required String activityId,
+  }) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => EvaluateActivityScreen(
+          studentId: studentId,
+          activityId: activityId,
+          professorService: professorService,
+          studentService: studentService,
+          onNavigate: _navigateTo,
+        ),
+      ),
+    );
   }
 
   @override
@@ -127,6 +148,7 @@ class _MainScaffoldState extends State<MainScaffold> {
     }
 
     final professorService = ProfessorService(baseUrl: widget.baseUrl);
+    final StudentService _studentService = StudentService();
 
     final List<Widget> screens = [
       HomeProfessorScreen(
@@ -134,7 +156,7 @@ class _MainScaffoldState extends State<MainScaffold> {
         onNavigate: _navigateTo,
         onEvaluateActivity: _openEvaluateActivity,
       ),
-      const InitialScreen(),
+      PublicActivityScreen(onNavigate: _navigateTo),
       PerfilProfessorScreen(onNavigate: _navigateTo),
       GerenciarAlunosScreen(
         key: _gerenciarAlunosKey,
@@ -149,10 +171,13 @@ class _MainScaffoldState extends State<MainScaffold> {
         },
       ),
       VincularAlunoScreen(onBack: () => _navigateTo(3)),
-      CreateActivityScreen(onNavigate: _navigateTo),
-      CreateQuestionAndAnswerActivityScreen(activityId: activityId ?? '', onNavigate: _navigateTo),
-      CreateDragAndDropActivityScreen(activityId: activityId ?? ''),
-      CreateFreeTextActivityScreen(activityId: activityId ?? ''),
+      CreateActivityScreen(onNavigateWithId: _navigateToWithActivityId),
+      CreateQuestionAndAnswerActivityScreen(
+        activityId: createdActivityId ?? '',
+        onNavigate: _navigateTo,
+      ),
+      CreateDragAndDropActivityScreen(activityId: createdActivityId ?? '',),
+      CreateFreeTextActivityScreen(activityId: createdActivityId ?? '',),
       _selectedStudentId != null
           ? LinkActivityToStudentScreen(
               professorId: userId!,
@@ -161,13 +186,16 @@ class _MainScaffoldState extends State<MainScaffold> {
               onNavigate: _navigateTo,
             )
           : const Center(child: Text('Nenhum aluno selecionado')),
-      EvaluateActivityScreen(
-        studentId: _evaluateStudentId ?? '',
-        activityId: _evaluateActivityId ?? '',
-        studentResponse: _evaluateStudentResponse ?? '',
-        professorService: professorService,
-        onNavigate: _navigateTo,
-      ),
+       if (_evaluateStudentId != null && _evaluateActivityId != null)
+        EvaluateActivityScreen(
+          studentService: _studentService,
+          professorService: professorService,
+          onNavigate: _navigateTo,
+          studentId: _evaluateStudentId!,
+          activityId: _evaluateActivityId!,
+        )
+      else
+        const Center(child: Text('Carregando avaliação...')),
       LinkActivityToStudentAllScreen(
         professorId: userId!,
         professorService: professorService,

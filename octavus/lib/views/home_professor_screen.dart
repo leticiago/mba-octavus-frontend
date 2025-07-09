@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import '../services/professorservice.dart';
 import '../services/user_session_service.dart';
+import '../services/evaluationsessionservice.dart';
 import '../models/pendingreviewmodel.dart';
 import '../core/app_routes.dart';
 
 class HomeProfessorScreen extends StatefulWidget {
   final ProfessorService professorService;
   final void Function(int)? onNavigate;
-  final void Function({
+  final Future<void> Function({
     required String studentId,
     required String activityId,
   })? onEvaluateActivity;
@@ -33,13 +34,21 @@ class _HomeProfessorScreenState extends State<HomeProfessorScreen> {
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final route = ModalRoute.of(context);
-    if (route != null && route.isCurrent) {
-      _loadPendingReviews(); 
+void didChangeDependencies() {
+  super.didChangeDependencies();
+
+  final route = ModalRoute.of(context);
+  if (route != null) {
+    route.addScopedWillPopCallback(() async {
+      _loadPendingReviews();
+      return true;
+    });
+
+    if (route.isCurrent) {
+      _loadPendingReviews();
     }
   }
+}
 
   Future<List<PendingReview>> _loadPendingReviews() async {
     final id = await UserSessionService.getUserId();
@@ -135,13 +144,14 @@ class _HomeProfessorScreenState extends State<HomeProfessorScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: itemsToShow.map((pr) {
                         return _buildPendingEvaluation(
-                          atividade: pr.atividade,
-                          aluno: pr.aluno,
-                          onTap: () {
-                            widget.onEvaluateActivity?.call(
-                              studentId: pr.alunoId,
-                              activityId: pr.atividadeId,
+                          atividade: pr.activity,
+                          aluno: pr.student,
+                          onTap: () async {
+                            await widget.onEvaluateActivity?.call(
+                              studentId: pr.studentId,
+                              activityId: pr.activityId,
                             );
+                            _loadPendingReviews();
                           },
                         );
                       }).toList(),
