@@ -1,0 +1,47 @@
+name: build-test-flutter
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout do código
+      uses: actions/checkout@v3
+
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: 'stable'
+
+    - name: Instalar dependências
+      run: flutter pub get
+
+    - name: Rodar testes com cobertura
+      run: flutter test --coverage
+
+    - name: Gerar relatório de cobertura em HTML
+      run: |
+        sudo apt-get install lcov
+        genhtml coverage/lcov.info -o coverage/html
+
+    - name: Verificar cobertura mínima 70%
+      run: |
+        TOTAL=$(lcov --summary coverage/lcov.info | grep lines | awk '{print $2}' | tr -d '%')
+        echo "Cobertura total: $TOTAL%"
+        if (( $(echo "$TOTAL < 70" | bc -l) )); then
+          echo "Cobertura abaixo do mínimo de 70%."
+          exit 1
+        fi
+
+    - name: Upload do relatório de cobertura como artefato
+      uses: actions/upload-artifact@v3
+      with:
+        name: cobertura-html
+        path: coverage/html
