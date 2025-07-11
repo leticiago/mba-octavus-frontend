@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/tokenservice.dart';
 import '../views/home_student_screen.dart';
+import '../views/metronome_screen.dart';
 import '../views/student_profile.dart';
 import '../views/student_activities_screen.dart';
 import '../views/student_question_and_answer.dart';
@@ -36,8 +37,9 @@ class _MainScaffoldAlunoState extends State<MainScaffoldAluno> {
   void _initScreens() {
     screens[0] = HomeAlunoScreen(onNavigate: _navigateTo);
     screens[1] = PublicActivityScreen(onNavigate: _navigateTo);
-    screens[2] = PerfilAlunoScreen(onNavigate: _navigateTo);
-    screens[3] = AlunoAtividadesScreen(onNavigate: _navigateTo);
+    screens[2] = MetronomeScreen();
+    screens[3] = PerfilAlunoScreen(onNavigate: _navigateTo);
+    screens[4] = AlunoAtividadesScreen(onNavigate: _navigateTo);
     if (_selectedIndex >= 4 && widget.activityId != null) {
       switch (_selectedIndex) {
         case 4:
@@ -170,6 +172,10 @@ class _MainScaffoldAlunoState extends State<MainScaffoldAluno> {
       items: const [
         BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Início'),
         BottomNavigationBarItem(icon: Icon(Icons.assignment), label: 'Atividades'),
+        BottomNavigationBarItem(
+                icon: Icon(Icons.music_note),
+                label: 'Metrônomo',
+              ),
         BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
                   ],
                 ),

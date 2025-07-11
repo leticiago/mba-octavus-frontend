@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:octavus/views/metronome_screen.dart';
 import 'package:octavus/views/public_activities_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -157,6 +158,7 @@ class _MainScaffoldState extends State<MainScaffold> {
         onEvaluateActivity: _openEvaluateActivity,
       ),
       PublicActivityScreen(onNavigate: _navigateTo),
+      MetronomeScreen(),
       PerfilProfessorScreen(onNavigate: _navigateTo),
       GerenciarAlunosScreen(
         key: _gerenciarAlunosKey,
@@ -271,6 +273,10 @@ class _MainScaffoldState extends State<MainScaffold> {
             items: const [
               BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Início'),
               BottomNavigationBarItem(icon: Icon(Icons.assignment), label: 'Atividades'),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.music_note),
+                label: 'Metrônomo',
+              ),
               BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
             ],
           ),
