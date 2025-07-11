@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:octavus/views/student_progress_screen.dart';
 import '../services/professorservice.dart';
 import '../models/studentmodel.dart';
 
@@ -7,6 +8,7 @@ class GerenciarAlunosScreen extends StatefulWidget {
   final ProfessorService professorService;
   final void Function(int) onNavigate;
   final void Function(String studentId) onStudentSelected;
+  final void Function(String studentId)? onViewReport;
 
   const GerenciarAlunosScreen({
     Key? key,
@@ -14,6 +16,7 @@ class GerenciarAlunosScreen extends StatefulWidget {
     required this.professorService,
     required this.onNavigate,
     required this.onStudentSelected,
+    this.onViewReport,
   }) : super(key: key);
 
   @override
@@ -126,13 +129,36 @@ class _GerenciarAlunosScreenState extends State<GerenciarAlunosScreen> {
                                           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                                         ),
                                       ),
+
+                                      // Botão para atribuir atividade (como antes)
                                       _actionButton(
                                         icon: Icons.add_circle,
-                                        onPressed: () => widget.onStudentSelected(aluno.id),
+                                        tooltip: 'Atribuir atividade',
+                                        onPressed: () {
+                                          widget.onStudentSelected(aluno.id);
+                                        },
                                       ),
                                       const SizedBox(width: 4),
+
+                                      _actionButton(
+                                        icon: Icons.bar_chart,
+                                        tooltip: 'Ver relatório',
+                                        onPressed: () {
+                                          if (widget.onViewReport != null) {
+                                            widget.onViewReport!(aluno.id);
+                                          } else {
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              const SnackBar(content: Text('Função para visualizar relatório não implementada')),
+                                            );
+                                          }
+                                        },
+                                      ),
+                                      const SizedBox(width: 4),
+
+                                      // Botão para desvincular
                                       _actionButton(
                                         icon: Icons.link_off,
+                                        tooltip: 'Desvincular aluno',
                                         onPressed: () => unlinkStudent(aluno),
                                       ),
                                     ],
@@ -171,7 +197,11 @@ class _GerenciarAlunosScreenState extends State<GerenciarAlunosScreen> {
     );
   }
 
-  Widget _actionButton({required IconData icon, required VoidCallback onPressed}) {
+  Widget _actionButton({
+    required IconData icon,
+    required VoidCallback onPressed,
+    String? tooltip,
+  }) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 2),
       decoration: const BoxDecoration(
@@ -179,11 +209,12 @@ class _GerenciarAlunosScreenState extends State<GerenciarAlunosScreen> {
         shape: BoxShape.circle,
       ),
       child: IconButton(
-        icon: Icon(icon, color: Color(0xFFDDFE71)),
+        icon: Icon(icon, color: const Color(0xFFDDFE71)),
         onPressed: onPressed,
         iconSize: 20,
         padding: const EdgeInsets.all(8),
         constraints: const BoxConstraints(),
+        tooltip: tooltip,
       ),
     );
   }

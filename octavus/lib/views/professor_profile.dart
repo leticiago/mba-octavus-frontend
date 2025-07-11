@@ -54,7 +54,7 @@ class _PerfilProfessorScreenState extends State<PerfilProfessorScreen> {
             context,
             title: 'Alunos',
             icon: Icons.group,
-            onTap: () => widget.onNavigate(3),
+            onTap: () => widget.onNavigate(4),
           ),
           _buildDisabledOptionTile(title: 'Atividades', icon: Icons.assignment),
           _buildDisabledOptionTile(title: 'Configurações', icon: Icons.settings),

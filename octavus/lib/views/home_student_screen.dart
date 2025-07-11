@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import '../services/tokenservice.dart';
 import '../services/user_session_service.dart';
-import '../services/studentservice.dart';
-import '../models/activitymodel.dart';
-import '../models/dtos/studentcompletedactivity.dart'; 
+import '../services/StudentService.dart';
+import '../models/dtos/studentcompletedactivity.dart';
 
 class HomeAlunoScreen extends StatefulWidget {
   final void Function(int) onNavigate;
@@ -82,8 +81,7 @@ class _HomeAlunoScreenState extends State<HomeAlunoScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 16),
-              _buildIconCardButton("Minhas atividades", Icons.arrow_right,
-                  onTap: () {
+              _buildIconCardButton("Minhas atividades", Icons.arrow_right, onTap: () {
                 widget.onNavigate(3);
               }),
               _buildProgressCard(),
@@ -94,8 +92,7 @@ class _HomeAlunoScreenState extends State<HomeAlunoScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text("Atividades recentes",
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                   GestureDetector(
                     onTap: () {
                     },
@@ -105,13 +102,11 @@ class _HomeAlunoScreenState extends State<HomeAlunoScreen> {
                 ],
               ),
               const SizedBox(height: 12),
-
               if (completedActivities.isEmpty)
                 const Text("Nenhuma atividade concluída encontrada."),
               ...completedActivities
-              .map((activity) => _buildRecentActivity(activity))
-              .toList(),
-
+                  .map((activity) => _buildRecentActivity(activity))
+                  .toList(),
             ],
           ),
         ),
@@ -157,8 +152,7 @@ class _HomeAlunoScreenState extends State<HomeAlunoScreen> {
     );
   }
 
-  Widget _buildIconCardButton(String text, IconData icon,
-      {VoidCallback? onTap}) {
+  Widget _buildIconCardButton(String text, IconData icon, {VoidCallback? onTap}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Container(
@@ -186,37 +180,53 @@ class _HomeAlunoScreenState extends State<HomeAlunoScreen> {
   }
 
   Widget _buildProgressCard() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFFDBE6F6),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text("Ver relatórios de progresso",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-          const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFEFE08D),
-                  foregroundColor: Colors.black,
+  return Container(
+    padding: const EdgeInsets.all(16),
+    decoration: BoxDecoration(
+      color: const Color(0xFFDBE6F6), 
+      borderRadius: BorderRadius.circular(16),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          "Ver relatórios de progresso",
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(height: 12),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFBFAF00),
+                foregroundColor: Colors.black,
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(24),
                 ),
-                onPressed: () {
-                },
-                child: const Text("Ver mais"),
               ),
-              const Icon(Icons.pie_chart, size: 48, color: Colors.blueGrey),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
+              onPressed: () async {
+                final studentId = await UserSessionService.getUserId();
+                if (studentId != null) {
+                  widget.onNavigate(8);
+                }
+              },
+              child: const Text("Ver mais"),
+            ),
+            Image.asset(
+              'assets/images/report.png',
+              width: 64,
+              height: 64,
+              fit: BoxFit.contain,
+            ),
+          ],
+        ),
+      ],
+    ),
+  );
+}
+
 
   Widget _buildMetaCard(String title) {
     return Opacity(

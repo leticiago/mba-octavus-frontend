@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:octavus/models/StudentMetrics.dart';
 import '../services/tokenservice.dart';
 import '../models/dtos/studentcompletedactivity.dart';
 import '../models/dtos/activitystudent.dart';
@@ -187,5 +188,27 @@ Future<bool> submitOpenTextAnswer({
       throw Exception('Erro ao buscar resposta: ${response.statusCode} - ${response.body}');
     }
   }
+
+  Future<StudentMetrics> getStudentMetrics(String studentId) async {
+  final token = await TokenService.getToken();
+  if (token == null) throw Exception('Token de autenticação não encontrado');
+
+  final url = Uri.parse('$baseUrl/student/$studentId/metrics');
+
+  final response = await http.get(
+    url,
+    headers: {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+    },
+  );
+
+  if (response.statusCode == 200) {
+    final data = json.decode(response.body);
+    return StudentMetrics.fromJson(data);
+  } else {
+    throw Exception('Erro ao buscar métricas: ${response.statusCode} - ${response.body}');
+  }
+}
 
 }

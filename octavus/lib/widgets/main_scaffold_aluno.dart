@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:octavus/views/student_progress_screen.dart';
 import '../services/tokenservice.dart';
+import '../services/User_Session_Service.dart';
+import '../services/StudentService.dart';
 import '../views/home_student_screen.dart';
 import '../views/metronome_screen.dart';
 import '../views/student_profile.dart';
@@ -22,50 +25,31 @@ class MainScaffoldAluno extends StatefulWidget {
 class _MainScaffoldAlunoState extends State<MainScaffoldAluno> {
   int _selectedIndex = 0;
   String? userName;
+  String? userId;
   bool _loading = true;
 
-  final List<Widget?> screens = List.filled(7, null); // agora começa vazio
+  final StudentService studentService = StudentService();
+  final Map<int, Widget> _screens = {};
 
   @override
   void initState() {
     super.initState();
     _selectedIndex = widget.initialIndex;
     _loadUserInfo();
-    _initScreens();
-  }
-
-  void _initScreens() {
-    screens[0] = HomeAlunoScreen(onNavigate: _navigateTo);
-    screens[1] = PublicActivityScreen(onNavigate: _navigateTo);
-    screens[2] = MetronomeScreen();
-    screens[3] = PerfilAlunoScreen(onNavigate: _navigateTo);
-    screens[4] = AlunoAtividadesScreen(onNavigate: _navigateTo);
-    if (_selectedIndex >= 4 && widget.activityId != null) {
-      switch (_selectedIndex) {
-        case 4:
-          screens[4] = AtividadeQuestionarioScreen(
-            activityId: widget.activityId!,
-            onNavigate: _navigateTo,
-          );
-          break;
-        case 5:
-          screens[5] = AtividadeDragDropScreen(activityId: widget.activityId!);
-          break;
-        case 6:
-          screens[6] = AtividadeTextoScreen(activityId: widget.activityId!);
-          break;
-      }
-    }
   }
 
   Future<void> _loadUserInfo() async {
     final token = await TokenService.getToken();
-    if (token != null) {
+    final id = await UserSessionService.getUserId();
+
+    if (token != null && id != null) {
       final name = TokenService.extractNameFromToken(token);
       setState(() {
         userName = name;
+        userId = id;
         _loading = false;
       });
+      _initScreens();
     } else {
       setState(() {
         _loading = false;
@@ -73,29 +57,59 @@ class _MainScaffoldAlunoState extends State<MainScaffoldAluno> {
     }
   }
 
+  void _initScreens() {
+    _screens[0] = HomeAlunoScreen(onNavigate: _navigateTo);
+    _screens[1] = PublicActivityScreen(onNavigate: _navigateTo);
+    _screens[2] = MetronomeScreen();
+    _screens[3] = PerfilAlunoScreen(onNavigate: _navigateTo);
+    _screens[4] = AlunoAtividadesScreen(onNavigate: _navigateTo);
+
+    if (widget.activityId != null) {
+      _screens[5] = AtividadeQuestionarioScreen(
+        activityId: widget.activityId!,
+        onNavigate: _navigateTo,
+      );
+      _screens[6] = AtividadeDragDropScreen(activityId: widget.activityId!);
+      _screens[7] = AtividadeTextoScreen(activityId: widget.activityId!);
+    }
+
+    if (userId != null) {
+      _screens[8] = StudentProgressScreen(
+        studentId: userId!,
+        onNavigate: _navigateTo,
+      );
+    }
+  }
+
   void _navigateTo(int index, {String? activityId}) {
     setState(() {
       _selectedIndex = index;
 
-      if (index == 1) {
-        screens[1] = PublicActivityScreen(onNavigate: _navigateTo);
-      }
-
-      if (index >= 4 && activityId != null) {
-        switch (index) {
-          case 4:
-            screens[4] = AtividadeQuestionarioScreen(
+      switch (index) {
+        case 1:
+          _screens[1] = PublicActivityScreen(onNavigate: _navigateTo);
+          break;
+        case 4:
+          _screens[4] = AlunoAtividadesScreen(onNavigate: _navigateTo);
+          break;
+        case 5:
+          if (activityId != null) {
+            _screens[5] = AtividadeQuestionarioScreen(
               activityId: activityId,
               onNavigate: _navigateTo,
             );
-            break;
-          case 5:
-            screens[5] = AtividadeDragDropScreen(activityId: activityId);
-            break;
-          case 6:
-            screens[6] = AtividadeTextoScreen(activityId: activityId);
-            break;
-        }
+          }
+          break;
+        case 6:
+          if (activityId != null) {
+            _screens[6] = AtividadeDragDropScreen(activityId: activityId);
+          }
+          break;
+        case 8:
+          if (userId != null) {
+            _screens[8] = StudentProgressScreen(onNavigate: _navigateTo, studentId: userId!);
+          }
+          break;
       }
     });
   }
@@ -107,7 +121,7 @@ class _MainScaffoldAlunoState extends State<MainScaffoldAluno> {
     }
 
     return Scaffold(
-      appBar: _selectedIndex > 2
+      appBar: _selectedIndex > 9
           ? null
           : PreferredSize(
               preferredSize: const Size.fromHeight(80),
@@ -137,50 +151,48 @@ class _MainScaffoldAlunoState extends State<MainScaffoldAluno> {
               ),
             ),
       body: IndexedStack(
-        index: _selectedIndex,
-        children: List.generate(
-          screens.length,
-          (i) => screens[i] ?? const SizedBox.shrink(), // evita erro null
+              index: _selectedIndex,
+              children: List.generate(
+                _selectedIndex + 1,
+                (i) => _screens[i] ?? const SizedBox.shrink(),
+              ),
+            ),
+
+      bottomNavigationBar: Container(
+        decoration: const BoxDecoration(
+          color: Color(0xFF35456B),
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
+          boxShadow: [
+            BoxShadow(color: Colors.black12, blurRadius: 8, offset: Offset(0, -2)),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
+          child: BottomNavigationBar(
+            backgroundColor: const Color(0xFF35456B),
+            currentIndex: _selectedIndex > 3 ? 0 : _selectedIndex,
+            selectedItemColor: Colors.white,
+            unselectedItemColor: Colors.white70,
+            onTap: (index) {
+              if (index == _selectedIndex) return;
+              _navigateTo(index);
+            },
+            type: BottomNavigationBarType.fixed,
+            items: const [
+              BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Início'),
+              BottomNavigationBarItem(icon: Icon(Icons.assignment), label: 'Atividades'),
+              BottomNavigationBarItem(icon: Icon(Icons.music_note), label: 'Metrônomo'),
+              BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
+            ],
+          ),
         ),
       ),
-      bottomNavigationBar: Container(
-  decoration: const BoxDecoration(
-    color: Color(0xFF35456B),
-    borderRadius: BorderRadius.only(
-      topLeft: Radius.circular(20),
-      topRight: Radius.circular(20),
-    ),
-    boxShadow: [
-      BoxShadow(color: Colors.black12, blurRadius: 8, offset: Offset(0, -2)),
-    ],
-  ),
-  child: ClipRRect(
-    borderRadius: const BorderRadius.only(
-      topLeft: Radius.circular(20),
-      topRight: Radius.circular(20),
-    ),
-    child: BottomNavigationBar(
-      backgroundColor: const Color(0xFF35456B),
-      currentIndex: _selectedIndex > 3 ? 0 : _selectedIndex, 
-      selectedItemColor: Colors.white,
-      unselectedItemColor: Colors.white70,
-      onTap: (index) {
-        if (index == _selectedIndex) return;
-        _navigateTo(index);
-      },
-      type: BottomNavigationBarType.fixed,
-      items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Início'),
-        BottomNavigationBarItem(icon: Icon(Icons.assignment), label: 'Atividades'),
-        BottomNavigationBarItem(
-                icon: Icon(Icons.music_note),
-                label: 'Metrônomo',
-              ),
-        BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
-                  ],
-                ),
-              ),
-            )
     );
   }
 }

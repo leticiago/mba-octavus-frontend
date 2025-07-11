@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/professorservice.dart';
 import '../services/user_session_service.dart';
-import '../services/evaluationsessionservice.dart';
 import '../models/pendingreviewmodel.dart';
 import '../core/app_routes.dart';
 
@@ -93,13 +92,13 @@ void didChangeDependencies() {
                 context,
                 text: 'Gerenciar alunos',
                 icon: Icons.group,
-                onTap: () => widget.onNavigate?.call(3),
+                onTap: () => widget.onNavigate?.call(4),
               ),
               const SizedBox(height: 16),
               _buildCard(
                 title: 'Ver relatórios de progresso',
                 onPressed: () {
-                  Navigator.pushNamed(context, '/relatorios');
+                  widget.onNavigate?.call(4);
                 },
                 backgroundColor: const Color(0xFFDBE6F6),
                 imageAsset: 'assets/images/report.png',

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:octavus/views/metronome_screen.dart';
 import 'package:octavus/views/public_activities_screen.dart';
+import 'package:octavus/views/student_progress_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../services/tokenservice.dart';
@@ -168,9 +169,15 @@ class _MainScaffoldState extends State<MainScaffold> {
         onStudentSelected: (studentId) {
           setState(() {
             _selectedStudentId = Student(id: studentId, name: '');
-            _selectedIndex = 9;
+            _selectedIndex = 10;
           });
         },
+         onViewReport: (studentId) {
+          setState(() {
+            _selectedStudentId = Student(id: studentId, name: '');
+            _selectedIndex = 13;
+          });
+         },
       ),
       VincularAlunoScreen(onBack: () => _navigateTo(3)),
       CreateActivityScreen(onNavigateWithId: _navigateToWithActivityId),
@@ -203,6 +210,13 @@ class _MainScaffoldState extends State<MainScaffold> {
         professorService: professorService,
         onNavigate: (index) => setState(() => _selectedIndex = index),
       ),
+      if (_selectedStudentId != null)
+          StudentProgressScreen(
+            studentId: _selectedStudentId!.id,
+            onNavigate: _navigateTo,
+          )
+        else
+          const Center(child: Text('Nenhum aluno selecionado')),
     ];
 
     return Scaffold(
