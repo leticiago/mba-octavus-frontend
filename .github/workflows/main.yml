@@ -40,8 +40,9 @@ jobs:
           exit 1
         fi
 
-    - name: Upload do relatório de cobertura como artefato
-      uses: actions/upload-artifact@v3
+    - name: Upload coverage report
+      uses: actions/upload-artifact@v3.1.1
       with:
-        name: cobertura-html
-        path: coverage/html
+        name: coverage-report
+        path: coverage/lcov.info
+
