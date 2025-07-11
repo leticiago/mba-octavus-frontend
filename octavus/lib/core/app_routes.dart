@@ -1,21 +1,14 @@
 import 'package:flutter/material.dart';
 
-import '../views/login_screen.dart';
-import '../views/tutorial_screen.dart';
-import '../views/home_student_screen.dart';
-import '../views/home_professor_screen.dart';
-import '../services/professorservice.dart';
-import '../views/create_activity_screen.dart';
-import '../views/register_screen.dart';
-import '../views/profile_setup_screen.dart';
-import '../views/professor_profile.dart';
-import '../views/link_student_professor.dart';
-import '../views/manage_students.dart';
-import '../views/initial_screen.dart';
-import '../views/create_question_and_answer_activity_screen.dart';
-import '../views/create_drag_and_drop_activity.dart';
-import '../views/create_free_text_activity.dart';
-import '../widgets/main_scaffold.dart'; 
+import '../views/Login/login_screen.dart';
+import '../views/Common/tutorial_screen.dart';
+import '../views/Login/register_screen.dart';
+import '../views/Profile/profile_setup_screen.dart';
+import '../views/Common/initial_screen.dart';
+import '../views/Activity/Professor/create_question_and_answer_activity_screen.dart';
+import '../views/Activity/Professor/create_drag_and_drop_activity.dart';
+import '../views/Activity/Professor/create_free_text_activity.dart';
+import '../widgets/Professor/main_scaffold.dart'; 
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AppRoutes {

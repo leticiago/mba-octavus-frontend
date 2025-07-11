@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import '../../../services/studentservice.dart';
+import '../../../services/User/studentservice.dart';
 import '../../../services/Auth/user_session_service.dart';
-import '../../../services/questionservice.dart';
+import '../../../services/activity/questionservice.dart';
 import '../../../models/opentextquestionmodel.dart';
 
 class AtividadeTextoScreen extends StatefulWidget {

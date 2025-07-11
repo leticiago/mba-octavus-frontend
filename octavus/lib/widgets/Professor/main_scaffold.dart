@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:octavus/services/user/studentservice.dart';
 import 'package:octavus/views/Common/metronome_screen.dart';
 import 'package:octavus/views/Common/public_activities_screen.dart';
 import 'package:octavus/views/Common/student_progress_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../services/tokenservice.dart';
+import '../../services/auth/tokenservice.dart';
 import '../../services/Auth/user_session_service.dart';
-import '../../services/professorservice.dart';
-import '../../services/studentservice.dart';
+import '../../services/professor/professorservice.dart';
 
 import '../../models/studentmodel.dart';
 import '../../views/Home/home_student_screen.dart';
@@ -22,7 +22,6 @@ import '../../views/Activity/Professor/create_free_text_activity.dart';
 import '../../views/Professor/link_student_activity.dart';
 import '../../views/Professor/link_student_activity_all.dart';
 import '../../views/Professor/evaluate_activity_screen.dart';
-import '../../views/Common/public_activities_screen.dart';
 
 class MainScaffold extends StatefulWidget {
   final String role;

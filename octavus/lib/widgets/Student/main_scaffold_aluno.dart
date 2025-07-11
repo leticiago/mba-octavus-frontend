@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:octavus/views/Common/student_progress_screen.dart';
-import '../../services/tokenservice.dart';
-import '../../services/User_Session_Service.dart';
+import '../../services/auth/tokenservice.dart';
+import '../../services/auth/User_Session_Service.dart';
 import '../../services/User/StudentService.dart';
 import '../../views/Home/home_student_screen.dart';
 import '../../views/Common/metronome_screen.dart';

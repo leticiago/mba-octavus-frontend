@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../models/dtos/activitystudent.dart';
-import '../../../services/studentservice.dart';
-import '../../../services/questionservice.dart';
+import '../../../../services/user/studentservice.dart';
+import '../../../services/activity/questionservice.dart';
 import '../../../services/Auth/user_session_service.dart';
-import 'student_question_and_answer.dart';
-import 'student_drag_and_drop.dart';
-import 'student_free_text.dart';
 import '../../../widgets/Student/main_scaffold_aluno.dart';
 
 

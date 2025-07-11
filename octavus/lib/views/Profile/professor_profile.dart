@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../Professor/manage_students.dart';
 import '../../services/Auth/TokenService.dart';
 import '../../services/Auth/user_session_service.dart';
-import '../../services/professorservice.dart';
+import '../../services/professor/professorservice.dart';
 
 class PerfilProfessorScreen extends StatefulWidget {
   final void Function(int) onNavigate;

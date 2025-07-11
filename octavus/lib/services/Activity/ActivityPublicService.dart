@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../../models/activitymodel.dart';
-import '../tokenservice.dart';
+import '../auth/tokenservice.dart';
 
 class ActivityPublicService {
   final String baseUrl;

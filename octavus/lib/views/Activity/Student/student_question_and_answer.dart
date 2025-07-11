@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../../../../services/questionservice.dart';
-import '../../../../services/studentservice.dart';
+import '../../../services/activity/questionservice.dart';
+import '../../../../services/user/studentservice.dart';
 import '../../../services/Auth/user_session_service.dart';
 
 class AtividadeQuestionarioScreen extends StatefulWidget {

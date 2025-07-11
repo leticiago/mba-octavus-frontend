@@ -3,8 +3,8 @@ import 'package:intl/intl.dart';
 
 import '../../../models/activitymodel.dart';
 import '../../../models/instrumentmodel.dart';
-import '../../../services/instrumentservice.dart';
-import '../../../services/professorservice.dart';
+import '../../../services/common/instrumentservice.dart';
+import '../../../services/professor/professorservice.dart';
 import '../../../services/Auth/user_session_service.dart';
 
 class CreateActivityScreen extends StatefulWidget {

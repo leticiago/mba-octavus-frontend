@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../services/questionservice.dart';
+import '../../../services/activity/questionservice.dart';
 
 class CreateFreeTextActivityScreen extends StatefulWidget {
   final String activityId;

@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import '../../models/activitymodel.dart';
 import '../../models/instrumentmodel.dart';
 import '../../services/Activity/QuestionService.dart';
-import '../../services/activitypublicservice.dart';
-import '../../services/instrumentservice.dart';
+import '../../services/activity/activitypublicservice.dart';
+import '../../services/common/instrumentservice.dart';
 import '../../widgets/Student/main_scaffold_aluno.dart';
 
 enum Level {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../services/professorservice.dart';
-import '../../services/studentservice.dart';
+import '../../services/professor/professorservice.dart';
+import '../../services/user/studentservice.dart';
 import '../../models/opentextanswermodel.dart';
 
 class EvaluateActivityScreen extends StatefulWidget {

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../services/tokenservice.dart';
+import '../../services/auth/tokenservice.dart';
 import '../../services/Auth/user_session_service.dart';
 
 class PerfilAlunoScreen extends StatefulWidget {

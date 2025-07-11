@@ -4,9 +4,9 @@ import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import '../../models/userregistrationmodel.dart';
 import '../../models/profilemodel.dart';
 import '../../models/instrumentmodel.dart';
-import '../../services/profileservice.dart';
-import '../../services/instrumentservice.dart';
-import '../../services/userservice.dart';
+import '../../services/common/profileservice.dart';
+import '../../services/common/instrumentservice.dart';
+import '../../services/user/userservice.dart';
 
 class ProfileSetupScreen extends StatefulWidget {
   const ProfileSetupScreen({super.key});

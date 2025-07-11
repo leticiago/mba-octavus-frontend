@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:octavus/models/forms/question_form_data.dart';
-import 'package:octavus/services/questionservice.dart';
+import 'package:octavus/services/activity/questionservice.dart';
 
 class CreateQuestionAndAnswerActivityScreen extends StatefulWidget {
   final String activityId;

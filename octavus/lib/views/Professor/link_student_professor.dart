@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../services/instrumentservice.dart';
+import '../../services/common/instrumentservice.dart';
 import '../../services/Auth/user_session_service.dart';
-import '../../services/tokenservice.dart';
-import '../../services/professorservice.dart';
+import '../../services/auth/tokenservice.dart';
+import '../../services/professor/professorservice.dart';
 import '../../models/instrumentmodel.dart';
 import '../../models/studentprofessormodel.dart';
 

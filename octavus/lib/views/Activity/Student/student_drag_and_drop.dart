@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../../../services/studentservice.dart';
+import '../../../../services/user/studentservice.dart';
 import '../../../services/Auth/user_session_service.dart';
-import '../../../../services/questionservice.dart';
+import '../../../services/activity/questionservice.dart';
 
 class AtividadeDragDropScreen extends StatefulWidget {
   final String activityId;

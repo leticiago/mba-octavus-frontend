@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../../models/LoginModel.dart';
 import 'TokenService.dart';
-import '../User_Session_Service.dart'; 
+import '../auth/User_Session_Service.dart'; 
 
 class AuthService {
   final String baseUrl = 'http://10.0.2.2:5277/api/authentication'; 
