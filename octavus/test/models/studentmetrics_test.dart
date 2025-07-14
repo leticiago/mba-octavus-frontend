@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:octavus/models/StudentMetrics.dart';
+import 'package:octavus/models/student_metrics_model.dart';
 
 void main() {
   group('StudentMetrics', () {

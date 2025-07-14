@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:octavus/models/LoginModel.dart';
+import 'package:octavus/models/login_model.dart';
 
 void main() {
   group('User', () {
