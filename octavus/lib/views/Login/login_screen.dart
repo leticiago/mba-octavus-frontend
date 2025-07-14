@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:octavus/models/login_model.dart';
 import '../../services/Auth/AuthenticationService.dart';
-import '../../models/LoginModel.dart';
 import '../../services/Auth/TokenService.dart';
 import '../../utils/JwtUtils.dart';
 import '../../widgets/Professor/main_scaffold.dart';

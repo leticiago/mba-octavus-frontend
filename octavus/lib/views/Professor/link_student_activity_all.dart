@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../../models/instrumentmodel.dart';
-import '../../models/studentmodel.dart';
-import '../../models/activitymodel.dart';
+import '../../models/instrument_model.dart';
+import '../../models/student_model.dart';
+import '../../models/activity_model.dart';
 import '../../models/dtos/assignactivityrequest.dart';
 
 import '../../services/common/instrumentservice.dart';

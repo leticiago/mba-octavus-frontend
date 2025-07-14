@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:octavus/models/activitymodel.dart';
+import 'package:octavus/models/activity_model.dart';
 
 void main() {
   group('Activity', () {

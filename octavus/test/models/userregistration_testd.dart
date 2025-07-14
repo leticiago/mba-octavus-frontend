@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:octavus/models/userregistrationmodel.dart';
+import 'package:octavus/models/user_registration_model.dart';
 
 void main() {
   group('UserRegistration', () {

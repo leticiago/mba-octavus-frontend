@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:octavus/models/studentprofessormodel.dart';
+import 'package:octavus/models/student_professor_model.dart';
 
 void main() {
   group('StudentProfessor', () {

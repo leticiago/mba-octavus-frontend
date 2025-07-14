@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../services/User/studentservice.dart';
 import '../../../services/Auth/user_session_service.dart';
 import '../../../services/activity/questionservice.dart';
-import '../../../models/opentextquestionmodel.dart';
+import '../../../models/open_text_question_model.dart';
 
 class AtividadeTextoScreen extends StatefulWidget {
   final String activityId;

@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../../models/instrumentmodel.dart';
+import '../../models/instrument_model.dart';
 
 class InstrumentService {
   final String baseUrl = 'http://10.0.2.2:5277';

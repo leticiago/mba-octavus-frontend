@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:octavus/models/StudentMetrics.dart';
+import '../../models/student_metrics_model.dart';
 import '../../services/User/StudentService.dart';
 
 class StudentProgressScreen extends StatefulWidget {

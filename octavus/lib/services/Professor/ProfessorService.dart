@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../../models/studentmodel.dart'; 
-import '../../models/studentprofessormodel.dart';
+import '../../models/student_model.dart'; 
+import '../../models/student_professor_model.dart';
 import '../auth/tokenservice.dart';
-import '../../models/pendingreviewmodel.dart';
-import '../../models/activitymodel.dart';
+import '../../models/pending_review_model.dart';
+import '../../models/activity_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../models/dtos/assignactivityrequest.dart';
 

@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:octavus/models/pendingreviewmodel.dart';
+import 'package:octavus/models/pending_review_model.dart';
 
 void main() {
   group('PendingReview', () {

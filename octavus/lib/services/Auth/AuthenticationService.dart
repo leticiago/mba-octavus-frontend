@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../../models/LoginModel.dart';
+import 'package:octavus/models/login_model.dart' show User;
 import 'TokenService.dart';
 import '../auth/User_Session_Service.dart'; 
 

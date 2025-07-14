@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../services/professor/professorservice.dart';
 import '../../services/Auth/user_session_service.dart';
-import '../../models/pendingreviewmodel.dart';
+import '../../models/pending_review_model.dart';
 import '../../core/app_routes.dart';
 
 class HomeProfessorScreen extends StatefulWidget {

@@ -1,9 +1,9 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
-import '../../models/userregistrationmodel.dart';
-import '../../models/profilemodel.dart';
-import '../../models/instrumentmodel.dart';
+import '../../models/user_registration_model.dart';
+import '../../models/profile_model.dart';
+import '../../models/instrument_model.dart';
 import '../../services/common/profileservice.dart';
 import '../../services/common/instrumentservice.dart';
 import '../../services/user/userservice.dart';

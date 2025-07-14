@@ -3,8 +3,8 @@ import '../../services/common/instrumentservice.dart';
 import '../../services/Auth/user_session_service.dart';
 import '../../services/auth/tokenservice.dart';
 import '../../services/professor/professorservice.dart';
-import '../../models/instrumentmodel.dart';
-import '../../models/studentprofessormodel.dart';
+import '../../models/instrument_model.dart';
+import '../../models/student_professor_model.dart';
 
 class VincularAlunoScreen extends StatefulWidget {
   final VoidCallback? onBack;

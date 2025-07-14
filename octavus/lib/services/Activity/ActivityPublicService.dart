@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../../models/activitymodel.dart';
+import '../../models/activity_model.dart';
 import '../auth/tokenservice.dart';
 
 class ActivityPublicService {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:octavus/views/Common/student_progress_screen.dart';
 import '../../services/professor/professorservice.dart';
-import '../../models/studentmodel.dart';
+import '../../models/student_model.dart';
 
 class GerenciarAlunosScreen extends StatefulWidget {
   final String professorId;

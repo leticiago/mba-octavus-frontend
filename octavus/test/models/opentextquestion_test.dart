@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:octavus/models/opentextquestionmodel.dart';
+import 'package:octavus/models/open_text_question_model.dart';
 
 void main() {
   group('OpenTextQuestionModel', () {

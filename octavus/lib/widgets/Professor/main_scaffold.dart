@@ -9,7 +9,7 @@ import '../../services/auth/tokenservice.dart';
 import '../../services/Auth/user_session_service.dart';
 import '../../services/professor/professorservice.dart';
 
-import '../../models/studentmodel.dart';
+import '../../models/student_model.dart';
 import '../../views/Home/home_student_screen.dart';
 import '../../views/Professor/link_student_professor.dart';
 import '../../views/Professor/manage_students.dart';

@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../../models/profilemodel.dart';
+import '../../models/profile_model.dart';
 
 class ProfileService {
   final String baseUrl = 'http://10.0.2.2:5277';

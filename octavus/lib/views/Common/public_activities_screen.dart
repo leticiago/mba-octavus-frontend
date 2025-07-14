@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../models/activitymodel.dart';
-import '../../models/instrumentmodel.dart';
+import '../../models/activity_model.dart';
+import '../../models/instrument_model.dart';
 import '../../services/Activity/QuestionService.dart';
 import '../../services/activity/activitypublicservice.dart';
 import '../../services/common/instrumentservice.dart';
