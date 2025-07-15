@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../services/Auth/token_service.dart';
 import '../Professor/manage_students.dart';
-import '../../services/Auth/TokenService.dart';
 import '../../services/Auth/user_session_service.dart';
 import '../../services/professor/professorservice.dart';
 
@@ -18,19 +18,21 @@ class _PerfilProfessorScreenState extends State<PerfilProfessorScreen> {
   int totalStudents = 0;
   int totalActivities = 0;
   final ProfessorService _professorService = ProfessorService();
+  late final TokenService _tokenService;
 
   @override
   void initState() {
     super.initState();
+    _tokenService = TokenService();
     _loadProfileData();
   }
 
   Future<void> _loadProfileData() async {
-    final token = await TokenService.getToken();
-    final userId = await UserSessionService.getUserId();  
+    final token = await _tokenService.getToken();
+    final userId = await UserSessionService.getUserId();
 
     if (token != null && userId != null) {
-      final userName = TokenService.extractNameFromToken(token);
+      final userName = _tokenService.extractNameFromToken(token);
       final students = await _professorService.getStudentsByProfessor(userId);
       final activities = await _professorService.getActivitiesByProfessor(userId);
 
@@ -40,6 +42,12 @@ class _PerfilProfessorScreenState extends State<PerfilProfessorScreen> {
         totalActivities = activities.length;
       });
     }
+  }
+
+  void logout(BuildContext context) async {
+    await _tokenService.removeToken();
+    await UserSessionService.clearSession();
+    Navigator.of(context).pushReplacementNamed('/login');
   }
 
   @override
@@ -68,12 +76,6 @@ class _PerfilProfessorScreenState extends State<PerfilProfessorScreen> {
         ],
       ),
     );
-  }
-
-  void logout(BuildContext context) async {
-    await TokenService.removeToken();
-    await UserSessionService.clearSession();
-    Navigator.of(context).pushReplacementNamed('/login');
   }
 
   Widget _buildProfileCard() {

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:octavus/services/Auth/token_service.dart';
+import 'package:octavus/services/Auth/Interfaces/ITokenService.dart';
+
 
 import '../../models/activity_model.dart';
 import '../../models/instrument_model.dart';
-import '../../services/Activity/QuestionService.dart';
+import '../../services/Activity/question_service.dart';
 import '../../services/activity/activitypublicservice.dart';
 import '../../services/common/instrumentservice.dart';
 import '../../widgets/Student/main_scaffold_aluno.dart';
@@ -42,18 +45,22 @@ class _PublicActivityScreenState extends State<PublicActivityScreen> {
   Level? _selectedLevel;
   bool _loadingInstruments = true;
 
-  @override
-  void initState() {
-    super.initState();
-    _loadInstruments();
-    _activities = ActivityPublicService().fetchPublicActivities();
-    _activities.then((value) {
-      setState(() {
-        _allActivities = value;
-        _filteredActivities = value;
-      });
+@override
+void initState() {
+  super.initState();
+  _loadInstruments();
+
+  final tokenService = TokenService(); 
+  final activityService = ActivityPublicService();
+
+  _activities = activityService.fetchPublicActivities();
+  _activities.then((value) {
+    setState(() {
+      _allActivities = value;
+      _filteredActivities = value;
     });
-  }
+  });
+}
 
   Future<void> _loadInstruments() async {
     try {
@@ -103,8 +110,9 @@ class _PublicActivityScreenState extends State<PublicActivityScreen> {
 
     switch (activity.type) {
       case 0:
-        final questions =
-            await QuestionService().getQuestionsByActivityId(activity.id!);
+        final tokenService = TokenService();
+        final questionService = QuestionService(tokenService: tokenService);
+        final questions = await questionService.getQuestionsByActivityId(activity.id!);
         if (questions.isEmpty) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text("Esta atividade ainda não possui perguntas.")),

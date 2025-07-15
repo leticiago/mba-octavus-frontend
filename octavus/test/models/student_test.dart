@@ -19,7 +19,7 @@ void main() {
     });
 
     test('Deve lançar erro ao criar a partir de JSON inválido', () {
-      final jsonInvalido = {'id': 123}; // falta campo name e id não é string
+      final jsonInvalido = {'id': 123};
 
       expect(() => Student.fromJson(jsonInvalido), throwsA(isA<TypeError>()));
     });

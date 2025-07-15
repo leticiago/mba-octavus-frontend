@@ -1,19 +1,25 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../../models/forms/question_form_data.dart';
-import '../Auth/TokenService.dart';
 import '../../models/open_text_question_model.dart';
+import 'package:octavus/services/Auth/Interfaces/ITokenService.dart';
 
 class QuestionService {
-  final String baseUrl = 'http://10.0.2.2:5277';
+  final String baseUrl;
+  final http.Client client;
+  final ITokenService tokenService;
 
-  QuestionService();
+  QuestionService({
+    required this.tokenService,
+    this.baseUrl = 'http://10.0.2.2:5277',
+    http.Client? client,
+  }) : client = client ?? http.Client();
 
   Future<bool> postQuestions({
     required String activityId,
     required List<QuestionFormData> questions,
   }) async {
-    final token = await TokenService.getToken();
+    final token = await tokenService.getToken();
     if (token == null) {
       throw Exception('Token de autenticação não encontrado');
     }
@@ -23,12 +29,12 @@ class QuestionService {
     final List<Map<String, dynamic>> formattedQuestions = questions.map((q) {
       return {
         'title': q.titleController.text,
-        'answers': List.generate(q.answers.length, (i) {
+        'answers': q.answers.map((a) {
           return {
-            'text': q.answers[i].textController.text,
-            'isCorrect': q.answers[i].isCorrect,
+            'text': a.textController.text,
+            'isCorrect': a.isCorrect,
           };
-        }),
+        }).toList(),
       };
     }).toList();
 
@@ -37,7 +43,7 @@ class QuestionService {
       'questions': formattedQuestions,
     });
 
-    final response = await http.post(
+    final response = await client.post(
       url,
       headers: {
         'Authorization': 'Bearer $token',
@@ -53,7 +59,7 @@ class QuestionService {
     required String activityId,
     required String originalSequence,
   }) async {
-    final token = await TokenService.getToken();
+    final token = await tokenService.getToken();
     if (token == null) {
       throw Exception('Token de autenticação não encontrado');
     }
@@ -65,7 +71,7 @@ class QuestionService {
       'originalSequence': originalSequence,
     });
 
-    final response = await http.post(
+    final response = await client.post(
       url,
       headers: {
         'Authorization': 'Bearer $token',
@@ -81,7 +87,7 @@ class QuestionService {
     required String activityId,
     required String title,
   }) async {
-    final token = await TokenService.getToken();
+    final token = await tokenService.getToken();
     if (token == null) {
       throw Exception('Token de autenticação não encontrado');
     }
@@ -93,7 +99,7 @@ class QuestionService {
       'title': title,
     });
 
-    final response = await http.post(
+    final response = await client.post(
       url,
       headers: {
         'Authorization': 'Bearer $token',
@@ -106,45 +112,52 @@ class QuestionService {
   }
 
   Future<List<dynamic>> getQuestionsByActivityId(String activityId) async {
-  final token = await TokenService.getToken();
-  if (token == null) {
-    throw Exception('Token de autenticação não encontrado');
-  }
-
-  final url = Uri.parse('$baseUrl/api/question/activity/$activityId');
-
-  final response = await http.get(
-    url,
-    headers: {
-      'Authorization': 'Bearer $token',
-      'Content-Type': 'application/json',
-    },
-  );
-
-  if (response.statusCode == 200) {
-    try {
-      final decoded = jsonDecode(response.body);
-      if (decoded is List) {
-        return decoded;
-      } else {
-        throw Exception('Resposta inesperada: não é uma lista');
-      }
-    } catch (e) {
-      throw Exception('Erro ao fazer parsing da resposta: $e');
+    final token = await tokenService.getToken();
+    if (token == null) {
+      throw Exception('Token de autenticação não encontrado');
     }
-  } else {
-    throw Exception('Erro ao buscar perguntas da atividade: ${response.body}');
+
+    final url = Uri.parse('$baseUrl/api/question/activity/$activityId');
+
+    final response = await client.get(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      try {
+        final decoded = jsonDecode(response.body);
+        if (decoded is List) {
+          return decoded;
+        } else {
+          throw Exception('Resposta inesperada: não é uma lista');
+        }
+      } catch (e) {
+        throw Exception('Erro ao fazer parsing da resposta: $e');
+      }
+    } else {
+      throw Exception('Erro ao buscar perguntas da atividade: ${response.body}');
+    }
   }
-}
 
   Future<Map<String, dynamic>> getDragAndDropOptions(String activityId) async {
-    final token = await TokenService.getToken();
+    final token = await tokenService.getToken();
+    if (token == null) {
+      throw Exception('Token de autenticação não encontrado');
+    }
+
     final url = Uri.parse('$baseUrl/api/draganddrop/$activityId');
 
-    final response = await http.get(url, headers: {
-      'Authorization': 'Bearer $token',
-      'Content-Type': 'application/json',
-    });
+    final response = await client.get(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
 
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
@@ -154,13 +167,20 @@ class QuestionService {
   }
 
   Future<OpenTextQuestionModel> getOpenTextActivity(String activityId) async {
-    final token = await TokenService.getToken();
+    final token = await tokenService.getToken();
+    if (token == null) {
+      throw Exception('Token de autenticação não encontrado');
+    }
+
     final url = Uri.parse('$baseUrl/api/opentext/question/$activityId');
 
-    final response = await http.get(url, headers: {
-      'Authorization': 'Bearer $token',
-      'Content-Type': 'application/json',
-    });
+    final response = await client.get(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
 
     if (response.statusCode == 200) {
       final List data = jsonDecode(response.body);
@@ -173,6 +193,4 @@ class QuestionService {
       throw Exception('Erro ao buscar atividade: ${response.statusCode}');
     }
   }
-
-
 }

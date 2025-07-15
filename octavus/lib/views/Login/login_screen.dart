@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:octavus/models/login_model.dart';
+import 'package:octavus/services/Auth/token_service.dart';
 import '../../services/Auth/AuthenticationService.dart';
-import '../../services/Auth/TokenService.dart';
 import '../../utils/JwtUtils.dart';
 import '../../widgets/Professor/main_scaffold.dart';
 import '../../widgets/Student/main_scaffold_aluno.dart';
@@ -18,6 +18,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
   final authService = AuthService();
+  final TokenService _tokenService = TokenService();
 
   bool _isLoading = false;
   String? loggedUserName;
@@ -29,9 +30,9 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _checkSavedToken() async {
-    final token = await TokenService.getToken();
+    final token = await _tokenService.getToken();
     if (token != null) {
-      final name = TokenService.extractNameFromToken(token);
+      final name = _tokenService.extractNameFromToken(token);
       if (name != null && name.isNotEmpty) {
         setState(() {
           loggedUserName = name;
@@ -53,9 +54,9 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _isLoading = false);
 
     if (token != null) {
-      await TokenService.saveToken(token);
+      await _tokenService.saveToken(token);
 
-      final name = TokenService.extractNameFromToken(token);
+      final name = _tokenService.extractNameFromToken(token);
       setState(() {
         loggedUserName = name;
       });
@@ -98,13 +99,10 @@ class _LoginScreenState extends State<LoginScreen> {
             children: [
               Center(
                 child: Text(
-                  loggedUserName != null
-                      ? 'Bem-vindo, $loggedUserName'
-                      : 'Olá!',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  loggedUserName != null ? 'Bem-vindo, $loggedUserName' : 'Olá!',
+                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
               ),
-              
 
               const SizedBox(height: 40),
 
