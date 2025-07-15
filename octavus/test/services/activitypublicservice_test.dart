@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:mockito/mockito.dart';
 
 import 'package:octavus/models/activity_model.dart';
-import 'package:octavus/services/activity/activity_public_service.dart';
+import 'package:octavus/services/Activity/activity_public_service.dart';
 
 import '../mocks.mocks.dart';
 void main() {
