@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../services/professor/professorservice.dart';
+import '../../services/professor/professor_service.dart';
 import '../../services/Auth/user_session_service.dart';
 import '../../models/pending_review_model.dart';
 import '../../core/app_routes.dart';

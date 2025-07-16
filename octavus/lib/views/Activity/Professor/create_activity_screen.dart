@@ -4,8 +4,9 @@ import 'package:intl/intl.dart';
 import '../../../models/activity_model.dart';
 import '../../../models/instrument_model.dart';
 import '../../../services/common/instrumentservice.dart';
-import '../../../services/professor/professorservice.dart';
-import '../../../services/Auth/user_session_service.dart';
+import '../../../services/professor/professor_service.dart';
+import '../../../services/auth/token_service.dart';
+import '../../../services/auth/user_session_service.dart';
 
 class CreateActivityScreen extends StatefulWidget {
   final void Function(int pageIndex, String activityId) onNavigateWithId;
@@ -75,7 +76,8 @@ class _CreateActivityScreenState extends State<CreateActivityScreen> {
 
     try {
       final professorId = await UserSessionService.getUserId();
-      if (professorId == null) throw Exception('ID do professor não encontrado');
+      final token = await TokenService().getToken();
+      if (professorId == null || token == null) throw Exception('Sessão inválida');
 
       final activity = Activity(
         name: _titleController.text,
@@ -88,7 +90,10 @@ class _CreateActivityScreenState extends State<CreateActivityScreen> {
         professorId: professorId,
       );
 
-      final service = ProfessorService(baseUrl: 'http://10.0.2.2:5277/api');
+      final service = ProfessorService(
+      baseUrl: 'http://10.0.2.2:5277/api',
+      tokenService: TokenService(),
+    );
       final activityId = await service.createActivity(activity);
 
       switch (_type) {
@@ -133,7 +138,6 @@ class _CreateActivityScreenState extends State<CreateActivityScreen> {
                 style: TextStyle(fontSize: 14, color: Colors.black54),
               ),
               const SizedBox(height: 20),
-
               _buildDropdownField(
                 label: 'Tipo',
                 value: _type,
@@ -143,10 +147,8 @@ class _CreateActivityScreenState extends State<CreateActivityScreen> {
                 borderRadius: borderRadius,
               ),
               const SizedBox(height: 12),
-
               _buildInstrumentDropdown(borderRadius),
               const SizedBox(height: 12),
-
               _buildTextField(
                 controller: _titleController,
                 label: 'Título',
@@ -154,7 +156,6 @@ class _CreateActivityScreenState extends State<CreateActivityScreen> {
                 borderRadius: borderRadius,
               ),
               const SizedBox(height: 12),
-
               _buildTextField(
                 controller: _descriptionController,
                 label: 'Descrição',
@@ -163,7 +164,6 @@ class _CreateActivityScreenState extends State<CreateActivityScreen> {
                 borderRadius: borderRadius,
               ),
               const SizedBox(height: 12),
-
               _buildDropdownField(
                 label: 'Dificuldade',
                 value: _difficulty,
@@ -173,7 +173,6 @@ class _CreateActivityScreenState extends State<CreateActivityScreen> {
                 borderRadius: borderRadius,
               ),
               const SizedBox(height: 12),
-
               GestureDetector(
                 onTap: _pickDate,
                 child: Container(
@@ -204,22 +203,16 @@ class _CreateActivityScreenState extends State<CreateActivityScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    'Tornar atividade pública?',
-                    style: TextStyle(fontSize: 16),
-                  ),
+                  const Text('Tornar atividade pública?', style: TextStyle(fontSize: 16)),
                   Switch(
                     value: _isPublic,
                     activeColor: Colors.green,
-                    onChanged: (value) {
-                      setState(() => _isPublic = value);
-                    },
+                    onChanged: (value) => setState(() => _isPublic = value),
                   ),
                 ],
               ),
               const SizedBox(height: 12),
               const Spacer(),
-
               SizedBox(
                 width: double.infinity,
                 height: 50,
@@ -232,14 +225,8 @@ class _CreateActivityScreenState extends State<CreateActivityScreen> {
                   onPressed: _isSubmitting ? null : _submitActivity,
                   child: _isSubmitting
                       ? const CircularProgressIndicator(color: Colors.black)
-                      : const Text(
-                          'Avançar >',
-                          style: TextStyle(
-                            color: Colors.black87,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 18,
-                          ),
-                        ),
+                      : const Text('Avançar >',
+                          style: TextStyle(color: Colors.black87, fontWeight: FontWeight.w600, fontSize: 18)),
                 ),
               ),
             ],

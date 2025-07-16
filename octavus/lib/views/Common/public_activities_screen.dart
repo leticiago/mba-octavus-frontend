@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:octavus/services/activity/activity_public_service.dart';
 import 'package:octavus/services/Auth/token_service.dart';
-import 'package:octavus/services/Auth/Interfaces/ITokenService.dart';
-
-
 import '../../models/activity_model.dart';
 import '../../models/instrument_model.dart';
-import '../../services/Activity/question_service.dart';
-import '../../services/activity/activitypublicservice.dart';
+import '../../services/activity/question_service.dart';
 import '../../services/common/instrumentservice.dart';
 import '../../widgets/Student/main_scaffold_aluno.dart';
 
@@ -37,6 +34,9 @@ class PublicActivityScreen extends StatefulWidget {
 }
 
 class _PublicActivityScreenState extends State<PublicActivityScreen> {
+  late final TokenService _tokenService;
+  late final ActivityPublicService _activityService;
+
   late Future<List<Activity>> _activities;
   List<Activity> _allActivities = [];
   List<Activity> _filteredActivities = [];
@@ -45,22 +45,23 @@ class _PublicActivityScreenState extends State<PublicActivityScreen> {
   Level? _selectedLevel;
   bool _loadingInstruments = true;
 
-@override
-void initState() {
-  super.initState();
-  _loadInstruments();
+  @override
+  void initState() {
+    super.initState();
 
-  final tokenService = TokenService(); 
-  final activityService = ActivityPublicService();
+    _tokenService = TokenService();
+    _activityService = ActivityPublicService(tokenService: _tokenService);
 
-  _activities = activityService.fetchPublicActivities();
-  _activities.then((value) {
-    setState(() {
-      _allActivities = value;
-      _filteredActivities = value;
+    _loadInstruments();
+
+    _activities = _activityService.fetchPublicActivities();
+    _activities.then((value) {
+      setState(() {
+        _allActivities = value;
+        _filteredActivities = value;
+      });
     });
-  });
-}
+  }
 
   Future<void> _loadInstruments() async {
     try {
@@ -110,8 +111,7 @@ void initState() {
 
     switch (activity.type) {
       case 0:
-        final tokenService = TokenService();
-        final questionService = QuestionService(tokenService: tokenService);
+        final questionService = QuestionService(tokenService: _tokenService);
         final questions = await questionService.getQuestionsByActivityId(activity.id!);
         if (questions.isEmpty) {
           ScaffoldMessenger.of(context).showSnackBar(

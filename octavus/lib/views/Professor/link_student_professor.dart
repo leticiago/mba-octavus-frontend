@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:octavus/services/auth/token_service.dart';
 import '../../services/common/instrumentservice.dart';
 import '../../services/Auth/user_session_service.dart';
-import '../../services/auth/tokenservice.dart';
-import '../../services/professor/professorservice.dart';
+import '../../services/professor/professor_service.dart';
 import '../../models/instrument_model.dart';
 import '../../models/student_professor_model.dart';
 
@@ -21,6 +21,8 @@ class _VincularAlunoScreenState extends State<VincularAlunoScreen> {
   Instrument? selectedInstrument;
   bool isLoading = true;
 
+  final TokenService _tokenService = TokenService();
+
   @override
   void initState() {
     super.initState();
@@ -38,7 +40,7 @@ class _VincularAlunoScreenState extends State<VincularAlunoScreen> {
   }
 
   Future<void> vincularAluno() async {
-    final token = await TokenService.getToken();
+    final token = await _tokenService.getToken();
     final professorId = await UserSessionService.getUserId();
 
     if (emailController.text.isEmpty || selectedInstrument == null || professorId == null) {
@@ -55,7 +57,10 @@ class _VincularAlunoScreenState extends State<VincularAlunoScreen> {
     );
 
     try {
-      final service = ProfessorService(baseUrl: 'http://10.0.2.2:5277');
+      final service = ProfessorService(
+        baseUrl: 'http://10.0.2.2:5277/api',
+        tokenService: _tokenService,
+      );
       await service.linkStudent(studentProfessor);
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -100,7 +105,6 @@ class _VincularAlunoScreenState extends State<VincularAlunoScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Título e seta
                     Row(
                       children: [
                         IconButton(
@@ -125,7 +129,6 @@ class _VincularAlunoScreenState extends State<VincularAlunoScreen> {
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 24),
-
                     DropdownButtonFormField<Instrument>(
                       value: selectedInstrument,
                       items: instrumentos
@@ -135,22 +138,15 @@ class _VincularAlunoScreenState extends State<VincularAlunoScreen> {
                               ))
                           .toList(),
                       decoration: _inputDecoration('Instrumento'),
-                      onChanged: (value) {
-                        setState(() {
-                          selectedInstrument = value;
-                        });
-                      },
+                      onChanged: (value) => setState(() => selectedInstrument = value),
                     ),
                     const SizedBox(height: 16),
-
                     TextField(
                       controller: emailController,
                       decoration: _inputDecoration('E-mail do aluno', icon: Icons.email),
                       keyboardType: TextInputType.emailAddress,
                     ),
-
                     const Spacer(),
-
                     SizedBox(
                       width: double.infinity,
                       height: 48,

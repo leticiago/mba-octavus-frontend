@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../../../services/activity/questionservice.dart';
-import '../../../../services/user/studentservice.dart';
+import 'package:octavus/services/activity/question_service.dart';
+import 'package:octavus/services/user/student_service.dart';
+import 'package:octavus/services/auth/token_service.dart';
 import '../../../services/Auth/user_session_service.dart';
 
 class AtividadeQuestionarioScreen extends StatefulWidget {
@@ -17,34 +18,38 @@ class AtividadeQuestionarioScreen extends StatefulWidget {
 
 class _AtividadeQuestionarioScreenState extends State<AtividadeQuestionarioScreen> {
   List<dynamic> questions = [];
-  Map<String, String> selectedAnswers = {}; 
+  Map<String, String> selectedAnswers = {};
   bool isLoading = true;
-  final QuestionService questionService = QuestionService();
-  final StudentService studentService = StudentService();
+
+  late final TokenService _tokenService;
+  late final QuestionService _questionService;
+  late final StudentService _studentService;
 
   @override
   void initState() {
     super.initState();
+    _tokenService = TokenService();
+    _questionService = QuestionService(tokenService: _tokenService);
+    _studentService = StudentService(tokenService: _tokenService);
     fetchQuestions();
   }
 
   Future<void> fetchQuestions() async {
-  try {
-    final data = await questionService.getQuestionsByActivityId(widget.activityId);
-    setState(() {
-      questions = data;
-      isLoading = false;
-    });
-  } catch (e) {
-    setState(() {
-      isLoading = false;
-    });
-    // ScaffoldMessenger.of(context).showSnackBar(
-    //   const SnackBar(content: Text('Erro ao carregar perguntas.')),
-    // );
+    try {
+      final data = await _questionService.getQuestionsByActivityId(widget.activityId);
+      setState(() {
+        questions = data;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   const SnackBar(content: Text('Erro ao carregar perguntas.')),
+      // );
+    }
   }
-}
-
 
   void handleAnswerSelect(String questionId, String answerId) {
     setState(() {
@@ -52,60 +57,58 @@ class _AtividadeQuestionarioScreenState extends State<AtividadeQuestionarioScree
     });
   }
 
- void submitAnswers() async {
-  if (selectedAnswers.length < questions.length) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Responda todas as perguntas antes de enviar.')),
-    );
-    return;
-  }
-
-  try {
-    final studentId = await UserSessionService.getUserId();
-    if (studentId == null) throw Exception('StudentId não encontrado');
-
-    final answersList = selectedAnswers.entries.map((e) {
-      return {
-        "questionId": e.key,
-        "selectedAnswerId": e.value,
-      };
-    }).toList();
-
-    final result = await StudentService().submitQuestionAndAnswer(
-      activityId: widget.activityId,
-      studentId: studentId,
-      answers: answersList,
-    );
-
-    final message = result['message']?.toString() ?? 'Resposta enviada!';
-    final score = result['score']?.toString();
-
-    await showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Sucesso'),
-        content: Text(score != null ? '$message\nPontuação: $score' : message),
-        actions: [
-          TextButton(
-            child: const Text('OK'),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-        ],
-      ),
-    );
-
-    if (mounted && widget is StatefulWidget && widget is dynamic && widget.onNavigate != null) {
-      widget.onNavigate?.call(0);
+  void submitAnswers() async {
+    if (selectedAnswers.length < questions.length) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Responda todas as perguntas antes de enviar.')),
+      );
+      return;
     }
 
-  } catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Erro ao enviar respostas: $e')),
-    );
+    try {
+      final studentId = await UserSessionService.getUserId();
+      if (studentId == null) throw Exception('StudentId não encontrado');
+
+      final answersList = selectedAnswers.entries.map((e) {
+        return {
+          "questionId": e.key,
+          "selectedAnswerId": e.value,
+        };
+      }).toList();
+
+      final result = await _studentService.submitQuestionAndAnswer(
+        activityId: widget.activityId,
+        studentId: studentId,
+        answers: answersList,
+      );
+
+      final message = result['message']?.toString() ?? 'Resposta enviada!';
+      final score = result['score']?.toString();
+
+      await showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: const Text('Sucesso'),
+          content: Text(score != null ? '$message\nPontuação: $score' : message),
+          actions: [
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+          ],
+        ),
+      );
+
+      if (mounted && widget.onNavigate != null) {
+        widget.onNavigate?.call(0);
+      }
+
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro ao enviar respostas: $e')),
+      );
+    }
   }
-}
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -130,7 +133,7 @@ class _AtividadeQuestionarioScreenState extends State<AtividadeQuestionarioScree
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.grey.shade300),
                     borderRadius: BorderRadius.circular(12),
-                    color: Color(0xFFE3EAF6),
+                    color: const Color(0xFFE3EAF6),
                   ),
                   child: ExpansionTile(
                     title: Text('Pergunta ${index + 1}'),

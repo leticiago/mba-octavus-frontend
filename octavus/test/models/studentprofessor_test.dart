@@ -47,7 +47,6 @@ void main() {
       final jsonInvalido = {
         'studentEmail': 'student@example.com',
         'instrumentId': 'instr456',
-        // falta professorId
       };
 
       expect(() => StudentProfessor.fromJson(jsonInvalido), throwsA(isA<TypeError>()));

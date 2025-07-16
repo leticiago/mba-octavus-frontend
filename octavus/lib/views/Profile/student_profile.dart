@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import '../../services/auth/tokenservice.dart';
+import 'package:octavus/services/auth/token_service.dart';
 import '../../services/Auth/user_session_service.dart';
 
 class PerfilAlunoScreen extends StatefulWidget {
   final void Function(int) onNavigate;
-
+  
   const PerfilAlunoScreen({super.key, required this.onNavigate});
 
   @override
@@ -13,6 +13,7 @@ class PerfilAlunoScreen extends StatefulWidget {
 
 class _PerfilAlunoScreenState extends State<PerfilAlunoScreen> {
   String alunoName = '...';
+   final tokenService = TokenService();
 
   @override
   void initState() {
@@ -21,9 +22,10 @@ class _PerfilAlunoScreenState extends State<PerfilAlunoScreen> {
   }
 
   Future<void> _loadProfileData() async {
-    final token = await TokenService.getToken();
+   
+    final token = await tokenService.getToken();
     if (token != null) {
-      final userName = TokenService.extractNameFromToken(token);
+      final userName = tokenService.extractNameFromToken(token);
       setState(() {
         alunoName = userName ?? 'Aluno(a)';
       });
@@ -31,7 +33,7 @@ class _PerfilAlunoScreenState extends State<PerfilAlunoScreen> {
   }
 
   void logout(BuildContext context) async {
-    await TokenService.removeToken();
+    await tokenService.removeToken();
     await UserSessionService.clearSession();
     Navigator.of(context).pushReplacementNamed('/login');
   }

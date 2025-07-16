@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
-import '../../../services/activity/questionservice.dart';
+import 'package:octavus/services/activity/question_service.dart';
+import 'package:octavus/services/Auth/Interfaces/ITokenService.dart';
 
 class CreateDragAndDropActivityScreen extends StatefulWidget {
   final String activityId;
+  final ITokenService tokenService;
   final void Function(int)? onNavigate;
 
   const CreateDragAndDropActivityScreen({
     super.key,
     required this.activityId,
+    required this.tokenService,
     this.onNavigate,
   });
 
@@ -36,7 +39,10 @@ class _CreateDragAndDropActivityScreenState
     setState(() => _isSubmitting = true);
 
     try {
-      final service = QuestionService();
+      final service = QuestionService(
+        tokenService: widget.tokenService,
+      );
+
       final success = await service.postDragAndDropActivity(
         activityId: widget.activityId,
         originalSequence: _optionsController.text.trim(),
@@ -50,9 +56,8 @@ class _CreateDragAndDropActivityScreenState
       ));
 
       if (success) {
-        if (widget.onNavigate != null) {
-          widget.onNavigate!(0);
-        } else {
+        widget.onNavigate?.call(0);
+        if (widget.onNavigate == null) {
           Navigator.pop(context);
         }
       }

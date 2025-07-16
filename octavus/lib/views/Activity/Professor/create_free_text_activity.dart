@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
-import '../../../services/activity/questionservice.dart';
+import 'package:octavus/services/activity/question_service.dart';
+import 'package:octavus/services/Auth/Interfaces/ITokenService.dart';
 
 class CreateFreeTextActivityScreen extends StatefulWidget {
   final String activityId;
+  final ITokenService tokenService;
   final void Function(int)? onNavigate;
 
   const CreateFreeTextActivityScreen({
     super.key,
     required this.activityId,
+    required this.tokenService,
     this.onNavigate,
   });
 
@@ -38,7 +41,9 @@ class _CreateFreeTextActivityScreenState
     setState(() => _isSubmitting = true);
 
     try {
-      final service = QuestionService();
+      final service = QuestionService(
+        tokenService: widget.tokenService,
+      );
       final success = await service.postFreeTextActivity(
         activityId: widget.activityId,
         title: _titleController.text.trim(),
@@ -52,11 +57,7 @@ class _CreateFreeTextActivityScreenState
       ));
 
       if (success) {
-        if (widget.onNavigate != null) {
-          widget.onNavigate!(0);
-        } else {
-          Navigator.pop(context);
-        }
+        widget.onNavigate?.call(0);
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(

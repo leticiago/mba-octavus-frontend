@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:octavus/views/Common/student_progress_screen.dart';
-import '../../services/professor/professorservice.dart';
+import '../../services/professor/professor_service.dart';
 import '../../models/student_model.dart';
 
 class GerenciarAlunosScreen extends StatefulWidget {
@@ -130,7 +130,6 @@ class _GerenciarAlunosScreenState extends State<GerenciarAlunosScreen> {
                                         ),
                                       ),
 
-                                      // Botão para atribuir atividade (como antes)
                                       _actionButton(
                                         icon: Icons.add_circle,
                                         tooltip: 'Atribuir atividade',
@@ -155,7 +154,6 @@ class _GerenciarAlunosScreenState extends State<GerenciarAlunosScreen> {
                                       ),
                                       const SizedBox(width: 4),
 
-                                      // Botão para desvincular
                                       _actionButton(
                                         icon: Icons.link_off,
                                         tooltip: 'Desvincular aluno',

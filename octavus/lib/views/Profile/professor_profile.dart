@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../services/Auth/token_service.dart';
-import '../Professor/manage_students.dart';
-import '../../services/Auth/user_session_service.dart';
-import '../../services/professor/professorservice.dart';
+import '../../services/auth/token_service.dart';
+import '../../services/auth/user_session_service.dart';
+import '../../services/professor/professor_service.dart';
 
 class PerfilProfessorScreen extends StatefulWidget {
   final void Function(int) onNavigate;
@@ -17,13 +16,18 @@ class _PerfilProfessorScreenState extends State<PerfilProfessorScreen> {
   String professorName = '...';
   int totalStudents = 0;
   int totalActivities = 0;
-  final ProfessorService _professorService = ProfessorService();
+
   late final TokenService _tokenService;
+  late final ProfessorService _professorService;
 
   @override
   void initState() {
     super.initState();
     _tokenService = TokenService();
+    _professorService = ProfessorService(
+      baseUrl: 'http://10.0.2.2:5277/api',
+      tokenService: _tokenService,
+    );
     _loadProfileData();
   }
 

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:octavus/services/user/student_service.dart';
+import 'package:octavus/services/auth/token_service.dart';
 import '../../models/student_metrics_model.dart';
-import '../../services/User/StudentService.dart';
+
 
 class StudentProgressScreen extends StatefulWidget {
   final String studentId;
@@ -19,11 +21,14 @@ class StudentProgressScreen extends StatefulWidget {
 
 class _StudentProgressScreenState extends State<StudentProgressScreen> {
   late Future<StudentMetrics> _metricsFuture;
-  final StudentService _service = StudentService();
+  late final StudentService _service;      
+  late final TokenService _tokenService;   
 
   @override
   void initState() {
     super.initState();
+    _tokenService = TokenService();
+    _service = StudentService(tokenService: _tokenService);  
     _metricsFuture = _service.getStudentMetrics(widget.studentId);
   }
 

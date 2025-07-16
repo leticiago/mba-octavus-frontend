@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:octavus/models/login_model.dart';
-import 'package:octavus/services/Auth/token_service.dart';
-import '../../services/Auth/AuthenticationService.dart';
+
+import '../../services/auth/authentication_service.dart';
+import '../../services/auth/token_service.dart';
 import '../../utils/JwtUtils.dart';
 import '../../widgets/Professor/main_scaffold.dart';
 import '../../widgets/Student/main_scaffold_aluno.dart';

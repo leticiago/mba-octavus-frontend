@@ -47,7 +47,6 @@ void main() {
         },
       };
 
-      // Como o factory espera totalActivitiesDone, ao não ter, deve lançar erro
       expect(() => StudentMetrics.fromJson(jsonInvalido), throwsA(isA<TypeError>()));
     });
   });

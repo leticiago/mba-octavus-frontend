@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:octavus/services/activity/question_service.dart';
+import 'package:octavus/services/user/student_service.dart';
+import 'package:octavus/services/auth/token_service.dart';
 import '../../../models/dtos/activitystudent.dart';
-import '../../../../services/user/studentservice.dart';
-import '../../../services/activity/questionservice.dart';
 import '../../../services/Auth/user_session_service.dart';
 import '../../../widgets/Student/main_scaffold_aluno.dart';
 
@@ -16,14 +17,22 @@ class AlunoAtividadesScreen extends StatefulWidget {
 }
 
 class _AlunoAtividadesScreenState extends State<AlunoAtividadesScreen> {
-  final StudentService studentService = StudentService();
+  late final TokenService _tokenService;
+  late final StudentService studentService;
+  late final QuestionService questionService;
+
   List<ActivityStudent> atividades = [];
   bool _loading = true;
-  final QuestionService questionService = QuestionService();
 
   @override
   void initState() {
     super.initState();
+
+    _tokenService = TokenService();
+
+    studentService = StudentService(tokenService: _tokenService);
+    questionService = QuestionService(tokenService: _tokenService);
+
     _loadActivities();
   }
 
@@ -144,43 +153,42 @@ class _AlunoAtividadesScreenState extends State<AlunoAtividadesScreen> {
     );
   }
 
- void _abrirAtividade(ActivityStudent atividade) async {
-  int targetIndex;
+  void _abrirAtividade(ActivityStudent atividade) async {
+    int targetIndex;
 
-  switch (atividade.type) {
-    case 0:
-      final questions = await QuestionService().getQuestionsByActivityId(atividade.activityId);
-      if (questions.isEmpty) {
+    switch (atividade.type) {
+      case 0:
+        final questions = await questionService.getQuestionsByActivityId(atividade.activityId);
+        if (questions.isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Esta atividade ainda não possui perguntas.")),
+          );
+          return;
+        }
+        targetIndex = 4;
+        break;
+      case 1:
+        targetIndex = 5;
+        break;
+      case 2:
+        targetIndex = 6;
+        break;
+      default:
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Esta atividade ainda não possui perguntas.")),
+          const SnackBar(content: Text("Tipo de atividade desconhecido")),
         );
         return;
-      }
-      targetIndex = 4;
-      break;
-    case 1:
-      targetIndex = 5;
-      break;
-    case 2:
-      targetIndex = 6;
-      break;
-    default:
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Tipo de atividade desconhecido")),
-      );
-      return;
-  }
+    }
 
-  Navigator.of(context).push(
-    MaterialPageRoute(
-      builder: (_) => MainScaffoldAluno(
-        initialIndex: targetIndex,
-        activityId: atividade.activityId,
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => MainScaffoldAluno(
+          initialIndex: targetIndex,
+          activityId: atividade.activityId,
+        ),
       ),
-    ),
-  );
-}
-
+    );
+  }
 
   double _mapStatusToProgress(ActivityStatus status) {
     switch (status) {

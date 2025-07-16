@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../../../services/user/studentservice.dart';
+import 'package:octavus/services/activity/question_service.dart';
+import 'package:octavus/services/user/student_service.dart';
+import 'package:octavus/services/auth/token_service.dart';
 import '../../../services/Auth/user_session_service.dart';
-import '../../../services/activity/questionservice.dart';
+
 
 class AtividadeDragDropScreen extends StatefulWidget {
   final String activityId;
@@ -16,6 +18,10 @@ class AtividadeDragDropScreen extends StatefulWidget {
 }
 
 class _AtividadeDragDropScreenState extends State<AtividadeDragDropScreen> {
+  late final TokenService _tokenService;
+  late final QuestionService _questionService;
+  late final StudentService _studentService;
+
   List<String> opcoes = [];
   String originalSequence = '';
   bool isLoading = true;
@@ -25,12 +31,15 @@ class _AtividadeDragDropScreenState extends State<AtividadeDragDropScreen> {
   @override
   void initState() {
     super.initState();
+    _tokenService = TokenService();
+    _questionService = QuestionService(tokenService: _tokenService);
+    _studentService = StudentService(tokenService: _tokenService);
     carregarOpcoes();
   }
 
   Future<void> carregarOpcoes() async {
     try {
-      final data = await QuestionService().getDragAndDropOptions(widget.activityId);
+      final data = await _questionService.getDragAndDropOptions(widget.activityId);
       setState(() {
         opcoes = List<String>.from(data['shuffledOptions']);
         originalSequence = data['originalSequence'];
@@ -47,47 +56,46 @@ class _AtividadeDragDropScreenState extends State<AtividadeDragDropScreen> {
   }
 
   Future<void> enviarResposta() async {
-  final studentId = await UserSessionService.getUserId();
-  if (studentId == null) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Aluno não identificado.')),
-    );
-    return;
+    final studentId = await UserSessionService.getUserId();
+    if (studentId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Aluno não identificado.')),
+      );
+      return;
+    }
+
+    try {
+      final result = await _studentService.submitDragAndDropAnswer(
+        activityId: widget.activityId,
+        studentId: studentId,
+        orderedOptions: opcoes,
+      );
+
+      final String message = result['message'] ?? 'Resposta enviada com sucesso.';
+      final double score = (result['score'] as num?)?.toDouble() ?? 0.0;
+
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: const Text('Resultado'),
+          content: Text('$message\nPontuação: $score'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).pop();
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro ao enviar resposta: $e')),
+      );
+    }
   }
-
-  try {
-    final result = await StudentService().submitDragAndDropAnswer(
-      activityId: widget.activityId,
-      studentId: studentId,
-      orderedOptions: opcoes,
-    );
-
-    final String message = result['message'] ?? 'Resposta enviada com sucesso.';
-    final double score = (result['score'] as num?)?.toDouble() ?? 0.0;
-
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Resultado'),
-        content: Text('$message\nPontuação: $score'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(); 
-              Navigator.of(context).pop(); 
-            },
-            child: const Text('OK'),
-          ),
-        ],
-      ),
-    );
-  } catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Erro ao enviar resposta: $e')),
-    );
-  }
-}
-
 
   Widget _buildTopBar() {
     return Container(

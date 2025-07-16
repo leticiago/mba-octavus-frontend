@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../../services/User/studentservice.dart';
+import 'package:octavus/services/activity/question_service.dart';
+import 'package:octavus/services/user/student_service.dart';
+import 'package:octavus/services/auth/token_service.dart';
 import '../../../services/Auth/user_session_service.dart';
-import '../../../services/activity/questionservice.dart';
 import '../../../models/open_text_question_model.dart';
 
 class AtividadeTextoScreen extends StatefulWidget {
@@ -19,15 +20,22 @@ class _AtividadeTextoScreenState extends State<AtividadeTextoScreen> {
   bool _isLoading = true;
   OpenTextQuestionModel? activityData;
 
+  late final TokenService _tokenService;
+  late final QuestionService _questionService;
+  late final StudentService _studentService;
+
   @override
   void initState() {
     super.initState();
+    _tokenService = TokenService();
+    _questionService = QuestionService(tokenService: _tokenService);
+    _studentService = StudentService(tokenService: _tokenService);
     _loadActivityData();
   }
 
   Future<void> _loadActivityData() async {
     try {
-      final data = await QuestionService().getOpenTextActivity(widget.activityId);
+      final data = await _questionService.getOpenTextActivity(widget.activityId);
       setState(() {
         activityData = data;
         _isLoading = false;
@@ -59,7 +67,7 @@ class _AtividadeTextoScreenState extends State<AtividadeTextoScreen> {
       final studentId = await UserSessionService.getUserId();
       if (studentId == null) throw Exception('ID do aluno não encontrado');
 
-      final success = await StudentService().submitOpenTextAnswer(
+      final success = await _studentService.submitOpenTextAnswer(
         studentId: studentId,
         responseText: text,
         questionId: activityData!.id,

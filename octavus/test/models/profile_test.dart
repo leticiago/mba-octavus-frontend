@@ -25,7 +25,6 @@ void main() {
     test('fromJson lança erro se faltar campo obrigatório', () {
       final jsonIncompleto = {
         'id': '3',
-        // 'name' ausente
       };
 
       expect(() => Profile.fromJson(jsonIncompleto), throwsA(isA<TypeError>()));

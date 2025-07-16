@@ -7,7 +7,7 @@ import '../../models/activity_model.dart';
 import '../../models/dtos/assignactivityrequest.dart';
 
 import '../../services/common/instrumentservice.dart';
-import '../../services/professor/professorservice.dart';
+import '../../services/professor/professor_service.dart';
 
 class LinkActivityToStudentScreen extends StatefulWidget {
   final String professorId;

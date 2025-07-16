@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:octavus/services/user/studentservice.dart';
+import 'package:octavus/services/professor/professor_service.dart';
+import 'package:octavus/services/user/student_service.dart';
+import 'package:octavus/services/auth/token_service.dart';
 import 'package:octavus/views/Common/metronome_screen.dart';
 import 'package:octavus/views/Common/public_activities_screen.dart';
 import 'package:octavus/views/Common/student_progress_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../services/auth/tokenservice.dart';
 import '../../services/Auth/user_session_service.dart';
-import '../../services/professor/professorservice.dart';
 
 import '../../models/student_model.dart';
 import '../../views/Home/home_student_screen.dart';
@@ -40,6 +40,10 @@ class MainScaffold extends StatefulWidget {
 }
 
 class _MainScaffoldState extends State<MainScaffold> {
+  late final TokenService _tokenService;
+  late ProfessorService professorService;
+  late StudentService studentService;
+
   int _selectedIndex = 0;
   String? token;
   String? userId;
@@ -53,29 +57,36 @@ class _MainScaffoldState extends State<MainScaffold> {
   String? _evaluateActivityId;
   String? _evaluateStudentResponse;
 
-  late ProfessorService professorService;
-  late StudentService studentService;
-
   final GlobalKey<State<GerenciarAlunosScreen>> _gerenciarAlunosKey =
       GlobalKey<State<GerenciarAlunosScreen>>();
 
   String? createdActivityId;
 
-
   @override
   void initState() {
     super.initState();
     _selectedIndex = widget.initialIndex;
+
+    _tokenService = TokenService();
+    professorService = ProfessorService(
+      baseUrl: widget.baseUrl,
+      tokenService: _tokenService,
+    );
+    studentService = StudentService(
+      baseUrl: widget.baseUrl,
+      tokenService: _tokenService,
+    );
+
     _loadData();
   }
 
   Future<void> _loadData() async {
     try {
-      token = await TokenService.getToken();
+      token = await _tokenService.getToken();
       userId = await UserSessionService.getUserId();
 
       if (token != null) {
-        userName = TokenService.extractNameFromToken(token!);
+        userName = _tokenService.extractNameFromToken(token!);
       }
 
       final prefs = await SharedPreferences.getInstance();
@@ -105,7 +116,7 @@ class _MainScaffoldState extends State<MainScaffold> {
     });
   }
 
-    void _navigateToWithActivityId(int index, String activityId) {
+  void _navigateToWithActivityId(int index, String activityId) {
     setState(() {
       createdActivityId = activityId;
       _selectedIndex = index;
@@ -113,8 +124,8 @@ class _MainScaffoldState extends State<MainScaffold> {
   }
 
   Future<void> _openEvaluateActivity({
-  required String studentId,
-  required String activityId,
+    required String studentId,
+    required String activityId,
   }) async {
     await Navigator.push(
       context,
@@ -148,9 +159,6 @@ class _MainScaffoldState extends State<MainScaffold> {
       return HomeAlunoScreen(onNavigate: _navigateTo);
     }
 
-    final professorService = ProfessorService(baseUrl: widget.baseUrl);
-    final StudentService _studentService = StudentService();
-
     final List<Widget> screens = [
       HomeProfessorScreen(
         professorService: professorService,
@@ -171,21 +179,31 @@ class _MainScaffoldState extends State<MainScaffold> {
             _selectedIndex = 10;
           });
         },
-         onViewReport: (studentId) {
+        onViewReport: (studentId) {
           setState(() {
             _selectedStudentId = Student(id: studentId, name: '');
             _selectedIndex = 13;
           });
-         },
+        },
       ),
       VincularAlunoScreen(onBack: () => _navigateTo(3)),
-      CreateActivityScreen(onNavigateWithId: _navigateToWithActivityId),
-      CreateQuestionAndAnswerActivityScreen(
-        activityId: createdActivityId ?? '',
-        onNavigate: _navigateTo,
-      ),
-      CreateDragAndDropActivityScreen(activityId: createdActivityId ?? '',),
-      CreateFreeTextActivityScreen(activityId: createdActivityId ?? '',),
+      CreateActivityScreen(
+        onNavigateWithId: _navigateToWithActivityId,
+        ),
+        CreateQuestionAndAnswerActivityScreen(
+          activityId: createdActivityId ?? '',
+          onNavigate: _navigateTo,
+          tokenService: _tokenService, 
+        ),
+        CreateDragAndDropActivityScreen(
+          activityId: createdActivityId ?? '',
+          tokenService: _tokenService, 
+        ),
+        CreateFreeTextActivityScreen(
+          activityId: createdActivityId ?? '',
+          tokenService: _tokenService, 
+        ),
+
       _selectedStudentId != null
           ? LinkActivityToStudentScreen(
               professorId: userId!,
@@ -194,9 +212,9 @@ class _MainScaffoldState extends State<MainScaffold> {
               onNavigate: _navigateTo,
             )
           : const Center(child: Text('Nenhum aluno selecionado')),
-       if (_evaluateStudentId != null && _evaluateActivityId != null)
+      if (_evaluateStudentId != null && _evaluateActivityId != null)
         EvaluateActivityScreen(
-          studentService: _studentService,
+          studentService: studentService,
           professorService: professorService,
           onNavigate: _navigateTo,
           studentId: _evaluateStudentId!,
@@ -210,12 +228,12 @@ class _MainScaffoldState extends State<MainScaffold> {
         onNavigate: (index) => setState(() => _selectedIndex = index),
       ),
       if (_selectedStudentId != null)
-          StudentProgressScreen(
-            studentId: _selectedStudentId!.id,
-            onNavigate: _navigateTo,
-          )
-        else
-          const Center(child: Text('Nenhum aluno selecionado')),
+        StudentProgressScreen(
+          studentId: _selectedStudentId!.id,
+          onNavigate: _navigateTo,
+        )
+      else
+        const Center(child: Text('Nenhum aluno selecionado')),
     ];
 
     return Scaffold(
@@ -229,7 +247,8 @@ class _MainScaffoldState extends State<MainScaffold> {
               bottomRight: Radius.circular(20),
             ),
           ),
-          padding: const EdgeInsets.only(top: 40, left: 20, right: 20, bottom: 10),
+          padding:
+              const EdgeInsets.only(top: 40, left: 20, right: 20, bottom: 10),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -285,11 +304,10 @@ class _MainScaffoldState extends State<MainScaffold> {
             type: BottomNavigationBarType.fixed,
             items: const [
               BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Início'),
-              BottomNavigationBarItem(icon: Icon(Icons.assignment), label: 'Atividades'),
               BottomNavigationBarItem(
-                icon: Icon(Icons.music_note),
-                label: 'Metrônomo',
-              ),
+                  icon: Icon(Icons.assignment), label: 'Atividades'),
+              BottomNavigationBarItem(
+                  icon: Icon(Icons.music_note), label: 'Metrônomo'),
               BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
             ],
           ),

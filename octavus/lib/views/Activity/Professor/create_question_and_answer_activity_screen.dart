@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:octavus/models/forms/question_form_data.dart';
-import 'package:octavus/services/activity/questionservice.dart';
+import 'package:octavus/services/activity/question_service.dart';
+import 'package:octavus/services/Auth/Interfaces/ITokenService.dart';
 
 class CreateQuestionAndAnswerActivityScreen extends StatefulWidget {
   final String activityId;
+  final ITokenService tokenService;
   final void Function(int)? onNavigate;
 
   const CreateQuestionAndAnswerActivityScreen({
     super.key,
     required this.activityId,
+    required this.tokenService,
     this.onNavigate,
   });
 
@@ -41,7 +44,9 @@ class _CreateQuestionAndAnswerActivityScreenState
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final service = QuestionService();
+    final service = QuestionService(
+      tokenService: widget.tokenService,
+    );
     final success = await service.postQuestions(
       activityId: widget.activityId,
       questions: questions,

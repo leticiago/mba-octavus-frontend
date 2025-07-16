@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:octavus/services/auth/token_service.dart';
+import 'package:octavus/services/user/student_service.dart';
 import 'package:octavus/views/Common/student_progress_screen.dart';
-import '../../services/auth/tokenservice.dart';
-import '../../services/auth/User_Session_Service.dart';
-import '../../services/User/StudentService.dart';
+import '../../services/auth/user_session_service.dart';
 import '../../views/Home/home_student_screen.dart';
 import '../../views/Common/metronome_screen.dart';
 import '../../views/Profile/student_profile.dart';
@@ -28,22 +28,25 @@ class _MainScaffoldAlunoState extends State<MainScaffoldAluno> {
   String? userId;
   bool _loading = true;
 
-  final StudentService studentService = StudentService();
+  late final StudentService studentService;
+  final TokenService _tokenService = TokenService();
   final Map<int, Widget> _screens = {};
 
   @override
   void initState() {
     super.initState();
     _selectedIndex = widget.initialIndex;
+
+    studentService = StudentService(tokenService: _tokenService);
     _loadUserInfo();
   }
 
   Future<void> _loadUserInfo() async {
-    final token = await TokenService.getToken();
+    final token = await _tokenService.getToken();
     final id = await UserSessionService.getUserId();
 
     if (token != null && id != null) {
-      final name = TokenService.extractNameFromToken(token);
+      final name = _tokenService.extractNameFromToken(token);
       setState(() {
         userName = name;
         userId = id;
@@ -107,7 +110,10 @@ class _MainScaffoldAlunoState extends State<MainScaffoldAluno> {
           break;
         case 8:
           if (userId != null) {
-            _screens[8] = StudentProgressScreen(onNavigate: _navigateTo, studentId: userId!);
+            _screens[8] = StudentProgressScreen(
+              studentId: userId!,
+              onNavigate: _navigateTo,
+            );
           }
           break;
       }
@@ -151,13 +157,12 @@ class _MainScaffoldAlunoState extends State<MainScaffoldAluno> {
               ),
             ),
       body: IndexedStack(
-              index: _selectedIndex,
-              children: List.generate(
-                _selectedIndex + 1,
-                (i) => _screens[i] ?? const SizedBox.shrink(),
-              ),
-            ),
-
+        index: _selectedIndex,
+        children: List.generate(
+          _selectedIndex + 1,
+          (i) => _screens[i] ?? const SizedBox.shrink(),
+        ),
+      ),
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
           color: Color(0xFF35456B),

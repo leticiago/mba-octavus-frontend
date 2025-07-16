@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:octavus/services/Auth/token_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../views/Login/login_screen.dart';
 import '../views/Common/tutorial_screen.dart';
@@ -8,8 +10,7 @@ import '../views/Common/initial_screen.dart';
 import '../views/Activity/Professor/create_question_and_answer_activity_screen.dart';
 import '../views/Activity/Professor/create_drag_and_drop_activity.dart';
 import '../views/Activity/Professor/create_free_text_activity.dart';
-import '../widgets/Professor/main_scaffold.dart'; 
-import 'package:shared_preferences/shared_preferences.dart';
+import '../widgets/Professor/main_scaffold.dart';
 
 class AppRoutes {
   static const String initial = '/';
@@ -24,12 +25,14 @@ class AppRoutes {
   static const String manageStudents = '/manage-students';
   static const String criarAtividade = '/criar-atividade';
 
-static Future<String?> _getSavedActivityId() async {
-  final prefs = await SharedPreferences.getInstance();
-  return prefs.getString('createdActivityId');
-}
+  static Future<String?> _getSavedActivityId() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('createdActivityId');
+  }
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
+    final tokenService = TokenService();
+
     switch (settings.name) {
       case initial:
         return MaterialPageRoute(builder: (_) => const InitialScreen());
@@ -68,7 +71,7 @@ static Future<String?> _getSavedActivityId() async {
           builder: (_) => MainScaffold(
             role: 'professor',
             baseUrl: 'http://10.0.2.2:5277/api',
-            initialIndex: 2, 
+            initialIndex: 2,
           ),
         );
 
@@ -86,7 +89,7 @@ static Future<String?> _getSavedActivityId() async {
           builder: (_) => MainScaffold(
             role: 'professor',
             baseUrl: 'http://10.0.2.2:5277/api',
-            initialIndex: 3, 
+            initialIndex: 3,
           ),
         );
 
@@ -100,77 +103,81 @@ static Future<String?> _getSavedActivityId() async {
         );
 
       case '/criar-pergunta-resposta':
-      final args = settings.arguments as void Function(int)?;
-      return MaterialPageRoute(
-        builder: (_) => FutureBuilder<String?>(
-          future: _getSavedActivityId(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Scaffold(
-                body: Center(child: CircularProgressIndicator()),
-              );
-            } else if (snapshot.hasError || !snapshot.hasData || snapshot.data == null) {
-              return const Scaffold(
-                body: Center(child: Text('ID da atividade não encontrado')),
-              );
-            } else {
-              final activityId = snapshot.data!;
-              return CreateQuestionAndAnswerActivityScreen(
-                activityId: activityId,
-                onNavigate: args,
-              );
-            }
-          },
-        ),
-      );
+        final args = settings.arguments as void Function(int)?;
+        return MaterialPageRoute(
+          builder: (_) => FutureBuilder<String?>(
+            future: _getSavedActivityId(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Scaffold(
+                  body: Center(child: CircularProgressIndicator()),
+                );
+              } else if (snapshot.hasError || !snapshot.hasData) {
+                return const Scaffold(
+                  body: Center(child: Text('ID da atividade não encontrado')),
+                );
+              } else {
+                return CreateQuestionAndAnswerActivityScreen(
+                  activityId: snapshot.data!,
+                  onNavigate: args,
+                  tokenService: tokenService,
+                );
+              }
+            },
+          ),
+        );
 
       case '/criar-arrasta-solta':
-      return MaterialPageRoute(
-        builder: (_) => FutureBuilder<String?>(
-          future: _getSavedActivityId(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Scaffold(
-                body: Center(child: CircularProgressIndicator()),
-              );
-            } else if (snapshot.hasError || !snapshot.hasData || snapshot.data == null) {
-              return const Scaffold(
-                body: Center(child: Text('ID da atividade não encontrado')),
-              );
-            } else {
-              final activityId = snapshot.data!;
-              return CreateDragAndDropActivityScreen(activityId: activityId);
-            }
-          },
-        ),
-      );
+        return MaterialPageRoute(
+          builder: (_) => FutureBuilder<String?>(
+            future: _getSavedActivityId(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Scaffold(
+                  body: Center(child: CircularProgressIndicator()),
+                );
+              } else if (snapshot.hasError || !snapshot.hasData) {
+                return const Scaffold(
+                  body: Center(child: Text('ID da atividade não encontrado')),
+                );
+              } else {
+                return CreateDragAndDropActivityScreen(
+                  activityId: snapshot.data!,
+                  tokenService: tokenService,
+                );
+              }
+            },
+          ),
+        );
 
-    case '/criar-livre':
-      return MaterialPageRoute(
-        builder: (_) => FutureBuilder<String?>(
-          future: _getSavedActivityId(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Scaffold(
-                body: Center(child: CircularProgressIndicator()),
-              );
-            } else if (snapshot.hasError || !snapshot.hasData || snapshot.data == null) {
-              return const Scaffold(
-                body: Center(child: Text('ID da atividade não encontrado')),
-              );
-            } else {
-              final activityId = snapshot.data!;
-              return CreateFreeTextActivityScreen(activityId: activityId);
-            }
-          },
-        ),
-      );
+      case '/criar-livre':
+        return MaterialPageRoute(
+          builder: (_) => FutureBuilder<String?>(
+            future: _getSavedActivityId(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Scaffold(
+                  body: Center(child: CircularProgressIndicator()),
+                );
+              } else if (snapshot.hasError || !snapshot.hasData) {
+                return const Scaffold(
+                  body: Center(child: Text('ID da atividade não encontrado')),
+                );
+              } else {
+                return CreateFreeTextActivityScreen(
+                  activityId: snapshot.data!,
+                  tokenService: tokenService,
+                );
+              }
+            },
+          ),
+        );
 
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(
             body: Center(
-            child: Text('Rota não encontrada: ${settings.name}'),
+              child: Text('Rota não encontrada: ${settings.name}'),
             ),
           ),
         );

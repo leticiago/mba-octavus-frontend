@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../services/auth/tokenservice.dart';
+import 'package:octavus/services/auth/token_service.dart';
 import '../../services/Auth/user_session_service.dart';
-import '../../services/User/StudentService.dart';
+import '../../services/user/student_service.dart';
 import '../../models/dtos/studentcompletedactivity.dart';
 
 class HomeAlunoScreen extends StatefulWidget {
@@ -20,18 +20,19 @@ class _HomeAlunoScreenState extends State<HomeAlunoScreen> {
   List<StudentCompletedActivity> completedActivities = [];
 
   late final StudentService studentService;
+  final tokenService = TokenService();
 
   @override
   void initState() {
     super.initState();
-    studentService = StudentService();
+    studentService = StudentService(tokenService: TokenService()); 
     _loadUserName();
   }
 
   Future<void> _loadUserName() async {
-    final token = await TokenService.getToken();
+    final token = await tokenService.getToken();
     if (token != null) {
-      final name = TokenService.extractNameFromToken(token);
+      final name = tokenService.extractNameFromToken(token);
       setState(() {
         userName = name;
         _loadingUser = false;
@@ -63,6 +64,9 @@ class _HomeAlunoScreenState extends State<HomeAlunoScreen> {
       setState(() {
         _loadingActivities = false;
       });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro ao carregar atividades concluídas: $e')),
+      );
     }
   }
 
@@ -180,53 +184,52 @@ class _HomeAlunoScreenState extends State<HomeAlunoScreen> {
   }
 
   Widget _buildProgressCard() {
-  return Container(
-    padding: const EdgeInsets.all(16),
-    decoration: BoxDecoration(
-      color: const Color(0xFFDBE6F6), 
-      borderRadius: BorderRadius.circular(16),
-    ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          "Ver relatórios de progresso",
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-        ),
-        const SizedBox(height: 12),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFBFAF00),
-                foregroundColor: Colors.black,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(24),
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFDBE6F6),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            "Ver relatórios de progresso",
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFBFAF00),
+                  foregroundColor: Colors.black,
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
+                  ),
                 ),
+                onPressed: () async {
+                  final studentId = await UserSessionService.getUserId();
+                  if (studentId != null) {
+                    widget.onNavigate(8);
+                  }
+                },
+                child: const Text("Ver mais"),
               ),
-              onPressed: () async {
-                final studentId = await UserSessionService.getUserId();
-                if (studentId != null) {
-                  widget.onNavigate(8);
-                }
-              },
-              child: const Text("Ver mais"),
-            ),
-            Image.asset(
-              'assets/images/report.png',
-              width: 64,
-              height: 64,
-              fit: BoxFit.contain,
-            ),
-          ],
-        ),
-      ],
-    ),
-  );
-}
-
+              Image.asset(
+                'assets/images/report.png',
+                width: 64,
+                height: 64,
+                fit: BoxFit.contain,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 
   Widget _buildMetaCard(String title) {
     return Opacity(
