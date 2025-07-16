@@ -10,19 +10,22 @@ import 'package:uuid/uuid.dart';
 class StudentService {
   final String baseUrl;
   final TokenService _tokenService;
+  final http.Client _client;
 
   StudentService({
     String? baseUrl,
     required TokenService tokenService,
+    http.Client? client, 
   })  : baseUrl = baseUrl ?? 'http://10.0.2.2:5277/api',
-        _tokenService = tokenService;
+        _tokenService = tokenService,
+        _client = client ?? http.Client(); 
 
   Future<List<StudentCompletedActivity>> getCompletedActivities(String studentId) async {
     final token = await _tokenService.getToken(); 
     if (token == null) throw Exception('Token de autenticação não encontrado');
 
     final url = Uri.parse('$baseUrl/student/$studentId/completed-activities');
-    final response = await http.get(
+    final response = await _client.get(
       url,
       headers: {
         'Authorization': 'Bearer $token',
@@ -43,7 +46,7 @@ class StudentService {
     if (token == null) throw Exception('Token de autenticação não encontrado');
 
     final url = Uri.parse('$baseUrl/student/$studentId/activities');
-    final response = await http.get(
+    final response = await _client.get(
       url,
       headers: {
         'Authorization': 'Bearer $token',
@@ -75,7 +78,7 @@ class StudentService {
       "answers": answers,
     });
 
-    final response = await http.post(
+    final response = await _client.post(
       url,
       headers: {
         'Authorization': 'Bearer $token',
@@ -107,7 +110,7 @@ class StudentService {
       'answer': orderedOptions.join(';'),
     });
 
-    final response = await http.post(
+    final response = await _client.post(
       url,
       headers: {
         'Authorization': 'Bearer $token',
@@ -142,7 +145,7 @@ class StudentService {
       "submittedAt": DateTime.now().toIso8601String(),
     });
 
-    final response = await http.post(
+    final response = await _client.post(
       url,
       headers: {
         'Authorization': 'Bearer $token',
@@ -167,7 +170,7 @@ class StudentService {
 
     final url = Uri.parse('$baseUrl/opentext/activity/$activityId/student/$studentId');
 
-    final response = await http.get(
+    final response = await _client.get(
       url,
       headers: {
         'Authorization': 'Bearer $token',
@@ -191,7 +194,7 @@ class StudentService {
 
     final url = Uri.parse('$baseUrl/student/$studentId/metrics');
 
-    final response = await http.get(
+    final response = await _client.get(
       url,
       headers: {
         'Authorization': 'Bearer $token',

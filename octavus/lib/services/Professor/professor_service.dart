@@ -10,22 +10,24 @@ import '../../models/dtos/assignactivityrequest.dart';
 
 class ProfessorService {
   final String baseUrl;
-  final TokenService _tokenService;
+  final TokenService tokenService;
+  final http.Client client; 
 
   ProfessorService({
     String? baseUrl,
-    required TokenService tokenService,
+    required this.tokenService,
+    http.Client? client, 
   })  : baseUrl = baseUrl ?? 'http://10.0.2.2:5277/api',
-        _tokenService = tokenService;
+        client = client ?? http.Client();
 
   Future<List<Student>> getStudentsByProfessor(String professorId) async {
-    final token = await _tokenService.getToken(); 
+    final token = await tokenService.getToken();
     if (token == null) {
       throw Exception('Token de autenticação não encontrado');
     }
 
     final url = Uri.parse('$baseUrl/professor/$professorId/students');
-    final response = await http.get(url, headers: {
+    final response = await client.get(url, headers: {
       'Authorization': 'Bearer $token',
       'Content-Type': 'application/json',
     });
@@ -39,13 +41,13 @@ class ProfessorService {
   }
 
   Future<void> linkStudent(StudentProfessor link) async {
-    final token = await _tokenService.getToken();
+    final token = await tokenService.getToken();
     if (token == null) {
       throw Exception('Token de autenticação não encontrado');
     }
 
     final url = Uri.parse('$baseUrl/professor/link-student');
-    final response = await http.post(url,
+    final response = await client.post(url,
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -58,13 +60,13 @@ class ProfessorService {
   }
 
   Future<List<PendingReview>> getPendingReviews(String professorId) async {
-    final token = await _tokenService.getToken(); 
+    final token = await tokenService.getToken();
     if (token == null) {
       throw Exception('Token de autenticação não encontrado');
     }
 
     final url = Uri.parse('$baseUrl/professor/$professorId/pending-reviews');
-    final response = await http.get(url, headers: {
+    final response = await client.get(url, headers: {
       'Authorization': 'Bearer $token',
       'Content-Type': 'application/json',
     });
@@ -79,13 +81,13 @@ class ProfessorService {
   }
 
   Future<String> createActivity(Activity activity) async {
-    final token = await _tokenService.getToken();
+    final token = await tokenService.getToken();
     if (token == null) {
       throw Exception('Token de autenticação não encontrado');
     }
 
     final url = Uri.parse('$baseUrl/activity');
-    final response = await http.post(
+    final response = await client.post(
       url,
       headers: {
         'Authorization': 'Bearer $token',
@@ -108,13 +110,13 @@ class ProfessorService {
   }
 
   Future<List<Activity>> getActivitiesByProfessor(String professorId) async {
-    final token = await _tokenService.getToken();
+    final token = await tokenService.getToken();
     if (token == null) {
       throw Exception('Token de autenticação não encontrado');
     }
 
     final url = Uri.parse('$baseUrl/activity/professor/$professorId');
-    final response = await http.get(url, headers: {
+    final response = await client.get(url, headers: {
       'Authorization': 'Bearer $token',
       'Content-Type': 'application/json',
     });
@@ -128,13 +130,13 @@ class ProfessorService {
   }
 
   Future<void> assignActivityToStudent(AssignActivityRequest request) async {
-    final token = await _tokenService.getToken();
+    final token = await tokenService.getToken();
     if (token == null) {
       throw Exception('Token de autenticação não encontrado');
     }
 
     final url = Uri.parse('$baseUrl/professor/assign-activity');
-    final response = await http.post(
+    final response = await client.post(
       url,
       headers: {
         'Authorization': 'Bearer $token',
@@ -154,14 +156,14 @@ class ProfessorService {
     required int score,
     required String comment,
   }) async {
-    final token = await _tokenService.getToken();
+    final token = await tokenService.getToken();
     if (token == null) {
       throw Exception('Token de autenticação não encontrado');
     }
 
     final url = Uri.parse('$baseUrl/professor/evaluate-activity');
 
-    final response = await http.put(
+    final response = await client.put(
       url,
       headers: {
         'Content-Type': 'application/json',

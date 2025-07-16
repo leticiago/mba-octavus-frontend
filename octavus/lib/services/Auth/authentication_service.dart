@@ -1,17 +1,25 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:octavus/models/login_model.dart' show User;
+import 'package:octavus/models/login_model.dart';
 import 'package:octavus/services/auth/token_service.dart';
-import 'User_Session_Service.dart';
+import 'user_session_service.dart';
 
 class AuthService {
-  final String baseUrl = 'http://10.0.2.2:5277/api/authentication';
-  final String userBaseUrl = 'http://10.0.2.2:5277/api/users';
+  String baseUrl;
+  String userBaseUrl;
+  final TokenService tokenService;
+  final http.Client client;
 
-  final tokenService = TokenService(); 
+  AuthService({
+    this.baseUrl = 'http://10.0.2.2:5277/api/authentication',
+    this.userBaseUrl = 'http://10.0.2.2:5277/api/users',
+    TokenService? tokenService,
+    http.Client? client,
+  })  : tokenService = tokenService ?? TokenService(),
+        client = client ?? http.Client();
 
   Future<String?> login(User user) async {
-    final response = await http.post(
+    final response = await client.post(
       Uri.parse('$baseUrl/login'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode(user.toJson()),
@@ -19,7 +27,7 @@ class AuthService {
 
     if (response.statusCode == 200) {
       final token = jsonDecode(response.body)['token'];
-      await tokenService.saveToken(token); 
+      await tokenService.saveToken(token);
 
       final email = tokenService.extractEmailFromToken(token);
       if (email != null) {
@@ -40,7 +48,7 @@ class AuthService {
 
     if (token == null) return null;
 
-    final response = await http.get(
+    final response = await client.get(
       Uri.parse('$userBaseUrl/email/$email'),
       headers: {
         'Content-Type': 'application/json',
