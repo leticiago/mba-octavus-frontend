@@ -6,7 +6,7 @@ import '../../models/student_model.dart';
 import '../../models/activity_model.dart';
 import '../../models/dtos/assignactivityrequest.dart';
 
-import '../../services/common/instrumentservice.dart';
+import '../../services/common/instrument_service.dart';
 import '../../services/professor/professor_service.dart';
 
 class LinkActivityToStudentScreen extends StatefulWidget {

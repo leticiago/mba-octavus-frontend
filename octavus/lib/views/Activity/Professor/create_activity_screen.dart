@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 
 import '../../../models/activity_model.dart';
 import '../../../models/instrument_model.dart';
-import '../../../services/common/instrumentservice.dart';
+import '../../../services/common/instrument_service.dart';
 import '../../../services/professor/professor_service.dart';
 import '../../../services/auth/token_service.dart';
 import '../../../services/auth/user_session_service.dart';

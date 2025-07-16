@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:octavus/services/auth/token_service.dart';
-import '../../services/common/instrumentservice.dart';
+import '../../services/common/instrument_service.dart';
 import '../../services/Auth/user_session_service.dart';
 import '../../services/professor/professor_service.dart';
 import '../../models/instrument_model.dart';

@@ -4,7 +4,7 @@ import 'package:octavus/services/Auth/token_service.dart';
 import '../../models/activity_model.dart';
 import '../../models/instrument_model.dart';
 import '../../services/activity/question_service.dart';
-import '../../services/common/instrumentservice.dart';
+import '../../services/common/instrument_service.dart';
 import '../../widgets/Student/main_scaffold_aluno.dart';
 
 enum Level {
