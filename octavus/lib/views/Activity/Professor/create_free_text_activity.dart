@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:octavus/services/activity/question_service.dart';
-import 'package:octavus/services/Auth/Interfaces/ITokenService.dart';
+import 'package:octavus/services/auth/interfaces/i_token_service.dart';
 
 class CreateFreeTextActivityScreen extends StatefulWidget {
   final String activityId;

@@ -6,6 +6,7 @@ import 'package:mockito/mockito.dart';
 import 'package:octavus/models/forms/answer_form_data.dart';
 import 'package:octavus/models/forms/question_form_data.dart';
 import 'package:octavus/services/Activity/question_service.dart';
+import 'package:octavus/services/auth/interfaces/i_token_service.dart';
 
 import '../mocks.mocks.dart';
 
@@ -20,7 +21,7 @@ void main() {
     mockTokenService = MockITokenService();
     service = QuestionService(
       client: mockClient,
-      tokenService: mockTokenService,
+      tokenService: mockTokenService as ITokenService,
     );
   });
 

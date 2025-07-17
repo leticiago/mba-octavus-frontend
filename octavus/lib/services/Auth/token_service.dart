@@ -1,4 +1,4 @@
-import 'package:octavus/services/Auth/Interfaces/ITokenService.dart';
+import 'package:octavus/services/auth/interfaces/i_token_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 

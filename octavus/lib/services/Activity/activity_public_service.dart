@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:octavus/services/Auth/Interfaces/ITokenService.dart';
+import 'package:octavus/services/auth/interfaces/i_token_service.dart';
 import '../../models/activity_model.dart';
 
 class ActivityPublicService {

@@ -1,5 +1,5 @@
 import 'package:mockito/mockito.dart';
-import 'package:octavus/services/Auth/Interfaces/ITokenService.dart';
+import 'package:octavus/services/auth/interfaces/i_token_service.dart';
 
 class MockTokenService extends Mock implements ITokenService {
   @override

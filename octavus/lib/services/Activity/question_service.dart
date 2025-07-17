@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../../models/forms/question_form_data.dart';
 import '../../models/open_text_question_model.dart';
-import 'package:octavus/services/Auth/Interfaces/ITokenService.dart';
+import 'package:octavus/services/auth/interfaces/i_token_service.dart';
 
 class QuestionService {
   final String baseUrl;

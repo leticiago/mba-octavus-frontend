@@ -6,9 +6,12 @@ import 'package:mockito/mockito.dart';
 
 import 'package:octavus/models/activity_model.dart';
 import 'package:octavus/services/Activity/activity_public_service.dart';
-
+import 'package:octavus/services/auth/interfaces/i_token_service.dart';
 
 import '../mocks.mocks.dart';
+
+
+
 void main() {
   late MockClient mockClient;
   late MockITokenService mockTokenService;
@@ -19,7 +22,7 @@ void main() {
     mockTokenService = MockITokenService();
     service = ActivityPublicService(
       client: mockClient,
-      tokenService: mockTokenService,
+      tokenService: mockTokenService as ITokenService,
     );
   });
 
