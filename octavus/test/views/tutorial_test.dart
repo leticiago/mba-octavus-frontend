@@ -12,7 +12,6 @@ void main() {
     expect(find.text('Pratique de onde estiver'), findsOneWidget);
     expect(find.textContaining('Tenha acesso aos exercícios'), findsOneWidget);
 
-    // Verifica botão next está presente
     expect(find.byIcon(Icons.arrow_forward_ios), findsOneWidget);
   });
 
@@ -21,14 +20,12 @@ void main() {
       MaterialApp(home: TutorialScreen()),
     );
 
-    // Swipe para a próxima página
     await tester.drag(find.byType(PageView), const Offset(-400.0, 0));
     await tester.pumpAndSettle();
 
     expect(find.text('Se conecte com seus alunos'), findsOneWidget);
     expect(find.textContaining('Envie atividades'), findsOneWidget);
 
-    // Swipe para a última página
     await tester.drag(find.byType(PageView), const Offset(-400.0, 0));
     await tester.pumpAndSettle();
 
@@ -40,23 +37,22 @@ void main() {
       MaterialApp(home: TutorialScreen()),
     );
 
-    // Pressiona next (da página 0 para 1)
     await tester.tap(find.byIcon(Icons.arrow_forward_ios));
     await tester.pumpAndSettle();
 
     expect(find.text('Se conecte com seus alunos'), findsOneWidget);
 
-    // Pressiona next (da página 1 para 2)
+
     await tester.tap(find.byIcon(Icons.arrow_forward_ios));
     await tester.pumpAndSettle();
 
     expect(find.textContaining('Não pode corrigir atividades?'), findsOneWidget);
 
-    // Pressiona next na última página - deve navegar para WelcomeScreen
+
     await tester.tap(find.byIcon(Icons.arrow_forward_ios));
     await tester.pumpAndSettle();
 
     expect(find.byType(WelcomeScreen), findsOneWidget);
-    expect(find.textContaining('Fulano'), findsOneWidget); // verifica userName
+    expect(find.textContaining('Fulano'), findsOneWidget);
   });
 }

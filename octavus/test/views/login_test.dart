@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:octavus/views/Login/login_screen.dart'; // atualize conforme o caminho real
+import 'package:octavus/views/Login/login_screen.dart';
 
 void main() {
   testWidgets('LoginScreen deve mostrar botão de Entrar', (WidgetTester tester) async {
@@ -20,11 +20,9 @@ void main() {
       ),
     );
 
-    // Simular clique no botão
     await tester.tap(find.text('Entrar'));
-    await tester.pump(); // dispara o SnackBar
+    await tester.pump();
 
-    // Verifica se apareceu alguma mensagem de erro
     expect(find.textContaining('Falha no login'), findsOneWidget);
   });
 }
