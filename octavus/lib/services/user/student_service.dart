@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:octavus/models/dtos/activitystudent.dart';
+import 'package:octavus/models/dtos/studentcompletedactivity.dart';
 import '../../models/student_metrics_model.dart';
 import '../auth/token_service.dart';
-import '../../models/dtos/studentcompletedactivity.dart';
-import '../../models/dtos/activitystudent.dart';
 import '../../models/open_text_answer_model.dart';
 import 'package:uuid/uuid.dart';
 
