@@ -28,24 +28,39 @@ jobs:
         run: flutter test --coverage
         working-directory: octavus
 
-      - name: Generate coverage summary
+      - name: Validate coverage (>= 70%)
         run: |
-          sudo apt-get install -y lcov
-          genhtml octavus/coverage/lcov.info --output-directory octavus/coverage/html
-        shell: bash
+          COVERAGE=$(grep -E '^\s*LF:' octavus/coverage/lcov.info | awk -F':' '{sum += $2} END {print sum}')
+          HITS=$(grep -E '^\s*LH:' octavus/coverage/lcov.info | awk -F':' '{sum += $2} END {print sum}')
+          PERCENT=$(awk -v h=$HITS -v t=$COVERAGE 'BEGIN { if (t > 0) printf "%.2f", (h/t)*100; else print 0 }')
 
-      - name: Check coverage threshold
-        run: |
-          total_lines=$(lcov --summary octavus/coverage/lcov.info | grep -Po 'lines\.*: \K[0-9]+(?=%)')
-          echo "Cobertura de linhas: $total_lines%"
-          if [ "$total_lines" -lt 70 ]; then
-            echo "Cobertura menor que 70%, falhando o job."
+          echo "Total lines: $COVERAGE"
+          echo "Lines hit: $HITS"
+          echo "Cobertura: $PERCENT%"
+
+          PERCENT_INT=${PERCENT%.*}
+          if [ "$PERCENT_INT" -lt 70 ]; then
+            echo "❌ Cobertura abaixo de 70%"
             exit 1
+          else
+            echo "✅ Cobertura OK (>= 70%)"
           fi
-        shell: bash
-        
-      - name: Upload coverage report
+
+      - name: Upload lcov.info
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-report
+          name: lcov.info
           path: octavus/coverage/lcov.info
+
+      - name: Optional HTML report (genhtml)
+        run: |
+          sudo apt-get update && sudo apt-get install -y lcov
+          genhtml coverage/lcov.info --output-directory=coverage/html --ignore-errors source || echo "⚠️ genhtml falhou"
+        working-directory: octavus
+
+      - name: Upload HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: html-coverage-report
+          path: octavus/coverage/html
