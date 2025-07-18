@@ -9,7 +9,6 @@ import 'package:octavus/services/common/instrument_service.dart';
 void main() {
   group('InstrumentService', () {
     test('getInstruments retorna lista de instrumentos no sucesso', () async {
-      // Mock da resposta HTTP
       final mockClient = MockClient((request) async {
         expect(request.url.path, '/api/v1/instruments');
         return http.Response(jsonEncode([
@@ -18,7 +17,6 @@ void main() {
         ]), 200);
       });
 
-      // Criar uma versão do service que aceita client (precisa ajustar InstrumentService para injetar client)
       final service = InstrumentServiceWithClient(client: mockClient);
 
       final instruments = await service.getInstruments();
@@ -43,7 +41,6 @@ void main() {
   });
 }
 
-/// Versão de InstrumentService que permite injetar um client para testes
 class InstrumentServiceWithClient extends InstrumentService {
   final http.Client client;
 
