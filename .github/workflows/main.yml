@@ -17,7 +17,7 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.32.6'
+          flutter-version: '3.22.1'
           cache: false
 
       - name: Install dependencies
@@ -28,15 +28,21 @@ jobs:
         run: flutter test --coverage
         working-directory: octavus
 
+      - name: Generate coverage summary
+        run: |
+          sudo apt-get install -y lcov
+          genhtml octavus/coverage/lcov.info --output-directory octavus/coverage/html
+        shell: bash
+
       - name: Check coverage threshold
         run: |
-          COVERAGE=$(grep -E 'lines\.*:' octavus/coverage/lcov.info | awk '{print $3}')
-          echo "Cobertura de linhas: $COVERAGE"
-          COVERAGE_INT=${COVERAGE%.*}
-          if [ "$COVERAGE_INT" -lt 70 ]; then
+          total_lines=$(lcov --summary octavus/coverage/lcov.info | grep -Po 'lines\.*: \K[0-9]+(?=%)')
+          echo "Cobertura de linhas: $total_lines%"
+          if [ "$total_lines" -lt 70 ]; then
             echo "Cobertura menor que 70%, falhando o job."
             exit 1
           fi
+        shell: bash
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
