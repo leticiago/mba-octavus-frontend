@@ -42,22 +42,18 @@ class _EvaluateActivityScreenState extends State<EvaluateActivityScreen> {
   }
 
   Future<void> _loadAnswer(String studentId, String activityId) async {
-  print('Iniciando _loadAnswer');
-
   try {
-    print('Chamando getOpenTextAnswer...');
+  
     final fetchedAnswer = await widget.studentService.getOpenTextAnswer(
       activityId: activityId,
       studentId: studentId,
     );
-    print('Resposta recebida: $fetchedAnswer');
 
     setState(() {
       _answer = fetchedAnswer;
       _isLoading = false;
     });
   } catch (e) {
-    print('Erro no _loadAnswer: $e');
     setState(() => _isLoading = false);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Erro ao carregar resposta: $e')),

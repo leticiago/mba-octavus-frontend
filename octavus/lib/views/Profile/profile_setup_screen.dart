@@ -81,10 +81,9 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
     );
 
     final success = await UserService().registerUser(userPayload.toJson());
-
     setState(() => isLoading = false);
 
-    if (success) {
+    if (success != null) {
       Navigator.pushNamed(context, '/tutorial');
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -95,8 +94,18 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final userData =
-        ModalRoute.of(context)!.settings.arguments as UserRegistration;
+    final args = ModalRoute.of(context)?.settings.arguments;
+
+if (args == null || args is! UserRegistration) {
+  return const Scaffold(
+    body: Center(
+      child: Text('Erro: dados do usuário não recebidos.'),
+    ),
+  );
+}
+
+final userData = args as UserRegistration;
+
 
     return Scaffold(
       backgroundColor: const Color(0xFFF7F7F7),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:octavus/services/Auth/token_service.dart';
+import 'package:octavus/widgets/Student/main_scaffold_aluno.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../views/Login/login_screen.dart';
@@ -44,15 +45,18 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const RegisterScreen());
 
       case profileSetup:
-        return MaterialPageRoute(builder: (_) => const ProfileSetupScreen());
+        return MaterialPageRoute(
+          builder: (context) => const ProfileSetupScreen(),
+          settings: settings,
+        );
+
 
       case tutorial:
         return MaterialPageRoute(builder: (_) => const TutorialScreen());
 
       case homeAluno:
         return MaterialPageRoute(
-          builder: (_) => MainScaffold(
-            role: 'aluno',
+          builder: (_) => MainScaffoldAluno(
             initialIndex: 0,
           ),
         );

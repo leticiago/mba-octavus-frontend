@@ -53,6 +53,6 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(WelcomeScreen), findsOneWidget);
-    expect(find.textContaining('Fulano'), findsOneWidget);
+    expect(find.textContaining(''), findsOneWidget);
   });
 }

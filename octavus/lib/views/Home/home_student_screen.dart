@@ -86,7 +86,7 @@ class _HomeAlunoScreenState extends State<HomeAlunoScreen> {
             children: [
               const SizedBox(height: 16),
               _buildIconCardButton("Minhas atividades", Icons.arrow_right, onTap: () {
-                widget.onNavigate(3);
+                widget.onNavigate(4);
               }),
               _buildProgressCard(),
               const SizedBox(height: 12),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../widgets/wave_clipper.dart';
 import '../Login/welcome_screen.dart';
+import 'package:octavus/services/auth/token_service.dart';
 
 class TutorialScreen extends StatefulWidget {
   const TutorialScreen({super.key});
@@ -13,32 +14,47 @@ class _TutorialScreenState extends State<TutorialScreen> {
   final PageController _controller = PageController();
   int _currentPage = 0;
 
+  final TokenService _tokenService = TokenService();
+
   final List<Map<String, String>> pages = [
     {
       'title': 'Pratique de onde estiver',
-      'description': 'Tenha acesso aos exercícios e materiais a qualquer hora e em qualquer lugar, direto no seu dispositivo. Aprenda no seu ritmo, sem limitações',
+      'description':
+          'Tenha acesso aos exercícios e materiais a qualquer hora e em qualquer lugar, direto no seu dispositivo. Aprenda no seu ritmo, sem limitações',
     },
     {
       'title': 'Se conecte com seus alunos',
-      'description': 'Envie atividades, acompanhe o progresso dos seus alunos e ofereça feedback personalizado para um aprendizado mais eficiente e motivador',
+      'description':
+          'Envie atividades, acompanhe o progresso dos seus alunos e ofereça feedback personalizado para um aprendizado mais eficiente e motivador',
     },
     {
       'title': 'Não pode corrigir atividades?\nAtue como um colaborador!',
-      'description': 'Se você não pode corrigir, ainda assim pode ajudar como colaborador, revisando conteúdos, organizando materiais e apoiando a comunidade',
+      'description':
+          'Se você não pode corrigir, ainda assim pode ajudar como colaborador, revisando conteúdos, organizando materiais e apoiando a comunidade',
     },
   ];
 
-  void _nextPage() {
+  void _nextPage() async {
     if (_currentPage < pages.length - 1) {
-      _controller.nextPage(duration: Duration(milliseconds: 300), curve: Curves.easeIn);
+      _controller.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.easeIn);
     } else {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const WelcomeScreen(userName: 'Fulano'),
-          ),
-        );
+      final token = await _tokenService.getToken();
+
+      String userName = '';
+      if (token != null) {
+        userName = _tokenService.extractNameFromToken(token) ?? '';
       }
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => WelcomeScreen(
+            userName: userName,
+            tokenService: _tokenService,
+          ),
+        ),
+      );
+    }
   }
 
   @override

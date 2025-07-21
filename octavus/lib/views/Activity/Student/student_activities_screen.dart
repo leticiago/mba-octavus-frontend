@@ -64,7 +64,6 @@ class _AlunoAtividadesScreenState extends State<AlunoAtividadesScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            _buildTopBar(),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Row(
