@@ -49,9 +49,9 @@ class _AtividadeDragDropScreenState extends State<AtividadeDragDropScreen> {
       });
     } catch (e) {
       setState(() => isLoading = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Erro ao carregar atividade.')),
-      );
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   const SnackBar(content: Text('Erro ao carregar atividade.')),
+      // );
     }
   }
 
@@ -125,7 +125,6 @@ class _AtividadeDragDropScreenState extends State<AtividadeDragDropScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildTopBar(),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
                     child: Row(

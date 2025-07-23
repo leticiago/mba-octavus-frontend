@@ -164,13 +164,13 @@ class _AlunoAtividadesScreenState extends State<AlunoAtividadesScreen> {
           );
           return;
         }
-        targetIndex = 4;
-        break;
-      case 1:
         targetIndex = 5;
         break;
-      case 2:
+      case 1:
         targetIndex = 6;
+        break;
+      case 2:
+        targetIndex = 7;
         break;
       default:
         ScaffoldMessenger.of(context).showSnackBar(

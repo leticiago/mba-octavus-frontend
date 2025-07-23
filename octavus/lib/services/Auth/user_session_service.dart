@@ -14,5 +14,5 @@ class UserSessionService {
   static Future<void> clearSession() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('userId');
-  }
+  } 
 }

@@ -13,12 +13,14 @@ class LinkActivityToStudentAllScreen extends StatefulWidget {
   final String professorId;
   final ProfessorService professorService;
   final void Function(int) onNavigate;
+  final int currentPageIndex; 
 
   const LinkActivityToStudentAllScreen({
     super.key,
     required this.professorId,
     required this.professorService,
     required this.onNavigate,
+    required this.currentPageIndex,
   });
 
   @override
@@ -26,8 +28,7 @@ class LinkActivityToStudentAllScreen extends StatefulWidget {
       _LinkActivityToStudentAllScreenState();
 }
 
-class _LinkActivityToStudentAllScreenState
-    extends State<LinkActivityToStudentAllScreen> {
+class _LinkActivityToStudentAllScreenState extends State<LinkActivityToStudentAllScreen> {
   List<Student> students = [];
   Student? selectedStudent;
 
@@ -39,6 +40,7 @@ class _LinkActivityToStudentAllScreenState
   Activity? selectedActivity;
 
   bool isLoading = true;
+  int? _lastPageIndex;
 
   @override
   void initState() {
@@ -46,7 +48,19 @@ class _LinkActivityToStudentAllScreenState
     _loadData();
   }
 
+  @override
+  void didUpdateWidget(covariant LinkActivityToStudentAllScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (_lastPageIndex != widget.currentPageIndex &&
+        widget.currentPageIndex == 12) { 
+      _loadData();
+    }
+    _lastPageIndex = widget.currentPageIndex;
+  }
+
   Future<void> _loadData() async {
+    setState(() => isLoading = true);
     try {
       final fetchedStudents =
           await widget.professorService.getStudentsByProfessor(widget.professorId);
@@ -58,6 +72,10 @@ class _LinkActivityToStudentAllScreenState
         students = fetchedStudents;
         instruments = fetchedInstruments;
         allActivities = fetchedActivities;
+        selectedStudent = null;
+        selectedInstrument = null;
+        selectedActivity = null;
+        filteredActivities = [];
         isLoading = false;
       });
     } catch (e) {

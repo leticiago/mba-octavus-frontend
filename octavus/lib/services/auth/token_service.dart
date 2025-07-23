@@ -42,4 +42,37 @@ class TokenService implements ITokenService {
     final payloadMap = jsonDecode(payload);
     return payloadMap['name'];
   }
+
+  String? extractRoleFromToken(String token) {
+    final payloadMap = _getPayload(token);
+    if (payloadMap == null) return null;
+
+     final roleClaim = payloadMap['roles'] ?? payloadMap['role'] ?? payloadMap['realm_access']?['roles'];
+    
+    if (roleClaim == null) return null;
+
+    if (roleClaim is String) {
+      return roleClaim;
+    } else if (roleClaim is List && roleClaim.isNotEmpty) {
+      return roleClaim.first.toString();
+    }
+
+    return null;
+  }
+
+  Map<String, dynamic>? _getPayload(String token) {
+    final parts = token.split('.');
+    if (parts.length != 3) return null;
+
+    try {
+      final payload = utf8.decode(base64Url.decode(base64Url.normalize(parts[1])));
+      final payloadMap = jsonDecode(payload);
+      if (payloadMap is Map<String, dynamic>) {
+        return payloadMap;
+      }
+    } catch (_) {
+      return null;
+    }
+    return null;
+  }
 }

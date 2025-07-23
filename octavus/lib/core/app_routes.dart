@@ -102,7 +102,7 @@ class AppRoutes {
           builder: (_) => MainScaffold(
             role: 'professor',
             baseUrl: 'http://10.0.2.2:5277/api',
-            initialIndex: 5,
+            initialIndex: 6,
           ),
         );
 

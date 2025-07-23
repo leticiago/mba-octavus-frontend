@@ -42,10 +42,10 @@ class _AtividadeTextoScreenState extends State<AtividadeTextoScreen> {
       });
     } catch (e) {
       setState(() => _isLoading = false);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Erro ao carregar atividade: $e'),
-        backgroundColor: Colors.red,
-      ));
+      // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      //   content: Text('Erro ao carregar atividade: $e'),
+      //   backgroundColor: Colors.red,
+      // ));
     }
   }
 
@@ -103,21 +103,6 @@ class _AtividadeTextoScreenState extends State<AtividadeTextoScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-              decoration: const BoxDecoration(
-                color: Color(0xFF35456B),
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(20),
-                  bottomRight: Radius.circular(20),
-                ),
-              ),
-              child: const Text(
-                'Olá, aluno',
-                style: TextStyle(color: Colors.white, fontSize: 18),
-              ),
-            ),
 
             Expanded(
               child: Padding(

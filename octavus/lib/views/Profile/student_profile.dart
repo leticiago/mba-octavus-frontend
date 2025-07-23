@@ -81,7 +81,7 @@ class _PerfilAlunoScreenState extends State<PerfilAlunoScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: const [
-              _ProfileInfoItem(label: 'Atividades', value: '5'),
+              _ProfileInfoItem(label: 'Atividades', value: '', faded: true),
               _ProfileInfoItem(label: 'XP', value: '---', faded: true),
               _ProfileInfoItem(label: 'Nível', value: '---', faded: true),
             ],

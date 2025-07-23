@@ -119,13 +119,13 @@ class _PublicActivityScreenState extends State<PublicActivityScreen> {
           );
           return;
         }
-        initialIndex = 4;
-        break;
-      case 1:
         initialIndex = 5;
         break;
-      case 2:
+      case 1:
         initialIndex = 6;
+        break;
+      case 2:
+        initialIndex = 7;
         break;
       default:
         ScaffoldMessenger.of(context).showSnackBar(
@@ -149,23 +149,24 @@ class _PublicActivityScreenState extends State<PublicActivityScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        centerTitle: true,
-        title: Column(
-          children: const [
-            Text(
-              "Atividades da Comunidade",
-              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black87),
-            ),
-            SizedBox(height: 4),
-            Text(
-              "Procure por uma atividade filtrando por instrumento",
-              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w400, color: Colors.black54),
-            ),
-          ],
-        ),
+      backgroundColor: Colors.white,
+      elevation: 0,
+      centerTitle: true,
+      automaticallyImplyLeading: false,
+      title: Column(
+        children: const [
+          Text(
+            "Atividades da Comunidade",
+            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black87),
+          ),
+          SizedBox(height: 4),
+          Text(
+            "Procure por uma atividade filtrando por instrumento",
+            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w400, color: Colors.black54),
+          ),
+        ],
       ),
+    ),
       body: Column(
         children: [
           if (_loadingInstruments)

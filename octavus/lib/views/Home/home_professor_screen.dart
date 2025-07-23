@@ -23,31 +23,38 @@ class HomeProfessorScreen extends StatefulWidget {
   State<HomeProfessorScreen> createState() => _HomeProfessorScreenState();
 }
 
-class _HomeProfessorScreenState extends State<HomeProfessorScreen> {
+class _HomeProfessorScreenState extends State<HomeProfessorScreen> with WidgetsBindingObserver {
   late Future<List<PendingReview>> _pendingReviewsFuture = Future.value([]);
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _loadPendingReviews();
   }
 
   @override
-void didChangeDependencies() {
-  super.didChangeDependencies();
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
 
-  final route = ModalRoute.of(context);
-  if (route != null) {
-    route.addScopedWillPopCallback(() async {
-      _loadPendingReviews();
-      return true;
-    });
-
-    if (route.isCurrent) {
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
       _loadPendingReviews();
     }
   }
-}
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    final route = ModalRoute.of(context);
+    if (route != null && route.isCurrent) {
+      _loadPendingReviews();
+    }
+  }
 
   Future<List<PendingReview>> _loadPendingReviews() async {
     final id = await UserSessionService.getUserId();
@@ -86,7 +93,7 @@ void didChangeDependencies() {
                 context,
                 text: 'Atribuir atividade',
                 icon: Icons.assignment,
-                onTap: () => widget.onNavigate?.call(11),
+                onTap: () => widget.onNavigate?.call(12),
               ),
               _buildIconCardButton(
                 context,
@@ -136,9 +143,7 @@ void didChangeDependencies() {
                     return const Text('Não há avaliações pendentes');
                   } else {
                     final reviews = snapshot.data!;
-                    final itemsToShow = reviews.length > 3
-                        ? reviews.sublist(0, 3)
-                        : reviews;
+                    final itemsToShow = reviews.length > 3 ? reviews.sublist(0, 3) : reviews;
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: itemsToShow.map((pr) {

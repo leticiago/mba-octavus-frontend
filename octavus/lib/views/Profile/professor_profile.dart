@@ -5,8 +5,13 @@ import '../../services/professor/professor_service.dart';
 
 class PerfilProfessorScreen extends StatefulWidget {
   final void Function(int) onNavigate;
+  final int currentPageIndex; 
 
-  const PerfilProfessorScreen({super.key, required this.onNavigate});
+  const PerfilProfessorScreen({
+    super.key,
+    required this.onNavigate,
+    required this.currentPageIndex,
+  });
 
   @override
   State<PerfilProfessorScreen> createState() => _PerfilProfessorScreenState();
@@ -20,6 +25,8 @@ class _PerfilProfessorScreenState extends State<PerfilProfessorScreen> {
   late final TokenService _tokenService;
   late final ProfessorService _professorService;
 
+  int? _lastPageIndex;
+
   @override
   void initState() {
     super.initState();
@@ -28,7 +35,19 @@ class _PerfilProfessorScreenState extends State<PerfilProfessorScreen> {
       baseUrl: 'http://10.0.2.2:5277/api',
       tokenService: _tokenService,
     );
-    _loadProfileData();
+    _loadProfileData(); 
+  }
+
+  @override
+  void didUpdateWidget(covariant PerfilProfessorScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (_lastPageIndex != widget.currentPageIndex &&
+        widget.currentPageIndex == 3) { 
+      _loadProfileData();
+    }
+
+    _lastPageIndex = widget.currentPageIndex;
   }
 
   Future<void> _loadProfileData() async {

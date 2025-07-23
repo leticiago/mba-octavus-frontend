@@ -38,7 +38,6 @@ void main() {
   });
 }
 
-/// Versão modificada do ProfileService que aceita injeção do client para testes
 class ProfileServiceWithClient extends ProfileService {
   final http.Client client;
 

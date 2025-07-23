@@ -64,9 +64,9 @@ class _HomeAlunoScreenState extends State<HomeAlunoScreen> {
       setState(() {
         _loadingActivities = false;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao carregar atividades concluídas: $e')),
-      );
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(content: Text('Erro ao carregar atividades concluídas: $e')),
+      // );
     }
   }
 

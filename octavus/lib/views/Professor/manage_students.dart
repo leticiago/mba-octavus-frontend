@@ -72,7 +72,7 @@ class _GerenciarAlunosScreenState extends State<GerenciarAlunosScreen> {
   }
 
   void addStudent() {
-    widget.onNavigate(4);
+    widget.onNavigate(5);
   }
 
   @override

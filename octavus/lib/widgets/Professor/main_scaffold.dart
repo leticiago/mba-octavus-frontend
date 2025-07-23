@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:octavus/services/common/instrument_service.dart';
 import 'package:octavus/services/professor/professor_service.dart';
 import 'package:octavus/services/user/student_service.dart';
 import 'package:octavus/services/auth/token_service.dart';
@@ -43,6 +44,7 @@ class _MainScaffoldState extends State<MainScaffold> {
   late final TokenService _tokenService;
   late ProfessorService professorService;
   late StudentService studentService;
+  late InstrumentService instrumentService;
 
   int _selectedIndex = 0;
   String? token;
@@ -76,6 +78,7 @@ class _MainScaffoldState extends State<MainScaffold> {
       baseUrl: widget.baseUrl,
       tokenService: _tokenService,
     );
+    instrumentService = InstrumentService();
 
     _loadData();
   }
@@ -123,23 +126,17 @@ class _MainScaffoldState extends State<MainScaffold> {
     });
   }
 
-  Future<void> _openEvaluateActivity({
-    required String studentId,
-    required String activityId,
-  }) async {
-    await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => EvaluateActivityScreen(
-          studentId: studentId,
-          activityId: activityId,
-          professorService: professorService,
-          studentService: studentService,
-          onNavigate: _navigateTo,
-        ),
-      ),
-    );
-  }
+ Future<void> _openEvaluateActivity({
+  required String studentId,
+  required String activityId,
+}) async {
+  setState(() {
+    _evaluateStudentId = studentId;
+    _evaluateActivityId = activityId;
+    _selectedIndex = 11; 
+  });
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -167,7 +164,7 @@ class _MainScaffoldState extends State<MainScaffold> {
       ),
       PublicActivityScreen(onNavigate: _navigateTo),
       MetronomeScreen(),
-      PerfilProfessorScreen(onNavigate: _navigateTo),
+      PerfilProfessorScreen(onNavigate: _navigateTo, currentPageIndex: _selectedIndex),
       GerenciarAlunosScreen(
         key: _gerenciarAlunosKey,
         professorId: userId!,
@@ -203,15 +200,17 @@ class _MainScaffoldState extends State<MainScaffold> {
           activityId: createdActivityId ?? '',
           tokenService: _tokenService, 
         ),
-
+        
       _selectedStudentId != null
           ? LinkActivityToStudentScreen(
               professorId: userId!,
               student: _selectedStudentId!,
               professorService: professorService,
+              instrumentService: instrumentService,
               onNavigate: _navigateTo,
             )
           : const Center(child: Text('Nenhum aluno selecionado')),
+
       if (_evaluateStudentId != null && _evaluateActivityId != null)
         EvaluateActivityScreen(
           studentService: studentService,
@@ -222,11 +221,14 @@ class _MainScaffoldState extends State<MainScaffold> {
         )
       else
         const Center(child: Text('Carregando avaliação...')),
+
       LinkActivityToStudentAllScreen(
         professorId: userId!,
         professorService: professorService,
         onNavigate: (index) => setState(() => _selectedIndex = index),
+        currentPageIndex: _selectedIndex,
       ),
+
       if (_selectedStudentId != null)
         StudentProgressScreen(
           studentId: _selectedStudentId!.id,
@@ -247,8 +249,7 @@ class _MainScaffoldState extends State<MainScaffold> {
               bottomRight: Radius.circular(20),
             ),
           ),
-          padding:
-              const EdgeInsets.only(top: 40, left: 20, right: 20, bottom: 10),
+          padding: const EdgeInsets.only(top: 40, left: 20, right: 20, bottom: 10),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -295,7 +296,7 @@ class _MainScaffoldState extends State<MainScaffold> {
           ),
           child: BottomNavigationBar(
             backgroundColor: const Color(0xFF35456b),
-            currentIndex: _selectedIndex > 2 ? 0 : _selectedIndex,
+            currentIndex: _selectedIndex > 3 ? 0 : _selectedIndex,
             selectedItemColor: Colors.white,
             unselectedItemColor: Colors.white70,
             selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600),
@@ -304,10 +305,8 @@ class _MainScaffoldState extends State<MainScaffold> {
             type: BottomNavigationBarType.fixed,
             items: const [
               BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Início'),
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.assignment), label: 'Atividades'),
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.music_note), label: 'Metrônomo'),
+              BottomNavigationBarItem(icon: Icon(Icons.assignment), label: 'Atividades'),
+              BottomNavigationBarItem(icon: Icon(Icons.music_note), label: 'Metrônomo'),
               BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
             ],
           ),

@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
-import '../../models/instrument_model.dart';
-import '../../models/student_model.dart';
-import '../../models/activity_model.dart';
+import 'package:octavus/models/activity_model.dart';
+import 'package:octavus/models/instrument_model.dart';
+import 'package:octavus/models/student_model.dart';
 import '../../models/dtos/assignactivityrequest.dart';
 
 import '../../services/common/instrument_service.dart';
@@ -13,6 +12,7 @@ class LinkActivityToStudentScreen extends StatefulWidget {
   final String professorId;
   final Student student;
   final ProfessorService professorService;
+  final InstrumentService instrumentService;
   final void Function(int) onNavigate;
 
   const LinkActivityToStudentScreen({
@@ -20,21 +20,35 @@ class LinkActivityToStudentScreen extends StatefulWidget {
     required this.professorId,
     required this.student,
     required this.professorService,
+    required this.instrumentService,
     required this.onNavigate,
   });
 
   @override
-  State<LinkActivityToStudentScreen> createState() => _LinkActivityToStudentScreenState();
+  State<LinkActivityToStudentScreen> createState() =>
+      _LinkActivityToStudentScreenState();
 }
 
-class _LinkActivityToStudentScreenState extends State<LinkActivityToStudentScreen> {
+class _LinkActivityToStudentScreenState
+    extends State<LinkActivityToStudentScreen> {
   List<Instrument> instruments = [];
   Instrument? selectedInstrument;
+
   List<Activity> allActivities = [];
   List<Activity> filteredActivities = [];
   Activity? selectedActivity;
 
   bool isLoading = true;
+
+  final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _dateController = TextEditingController();
+
+  @override
+  void dispose() {
+    _descriptionController.dispose();
+    _dateController.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -44,12 +58,19 @@ class _LinkActivityToStudentScreenState extends State<LinkActivityToStudentScree
 
   Future<void> _loadInstrumentsAndActivities() async {
     try {
-      final instrs = await InstrumentService().getInstruments();
-      final acts = await widget.professorService.getActivitiesByProfessor(widget.professorId);
+      final fetchedInstruments =
+          await widget.instrumentService.getInstruments();
+      final fetchedActivities =
+          await widget.professorService.getActivitiesByProfessor(widget.professorId);
 
       setState(() {
-        instruments = instrs;
-        allActivities = acts;
+        instruments = fetchedInstruments;
+        allActivities = fetchedActivities;
+        filteredActivities = [];
+        selectedInstrument = null;
+        selectedActivity = null;
+        _descriptionController.text = '';
+        _dateController.text = '';
         isLoading = false;
       });
     } catch (e) {
@@ -63,12 +84,30 @@ class _LinkActivityToStudentScreenState extends State<LinkActivityToStudentScree
   void _filterActivitiesByInstrument() {
     setState(() {
       selectedActivity = null;
+      _descriptionController.text = '';
+      _dateController.text = '';
+
       if (selectedInstrument != null) {
         filteredActivities = allActivities
             .where((a) => a.instrumentId == selectedInstrument!.id)
             .toList();
       } else {
         filteredActivities = [];
+      }
+    });
+  }
+
+  void _onActivityChanged(Activity? value) {
+    setState(() {
+      selectedActivity = value;
+
+      if (selectedActivity != null) {
+        _descriptionController.text = selectedActivity!.description;
+        _dateController.text =
+            DateFormat('dd/MM/yyyy').format(selectedActivity!.date);
+      } else {
+        _descriptionController.text = '';
+        _dateController.text = '';
       }
     });
   }
@@ -107,7 +146,8 @@ class _LinkActivityToStudentScreenState extends State<LinkActivityToStudentScree
           ? const Center(child: CircularProgressIndicator())
           : SafeArea(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -115,7 +155,7 @@ class _LinkActivityToStudentScreenState extends State<LinkActivityToStudentScree
                       children: [
                         IconButton(
                           icon: const Icon(Icons.arrow_back),
-                          onPressed: () => widget.onNavigate(3),
+                          onPressed: () => widget.onNavigate(4),
                         ),
                         const Spacer(),
                         const Text(
@@ -129,21 +169,22 @@ class _LinkActivityToStudentScreenState extends State<LinkActivityToStudentScree
                       ],
                     ),
                     const SizedBox(height: 12),
-                    const Center(
+                    Center(
                       child: Text(
-                        'Vincule um exercício para que seu aluno pratique durante a semana.',
+                        'Vincule um exercício para que ${widget.student.name} pratique durante a semana.',
                         textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 14, color: Colors.black87),
+                        style:
+                            const TextStyle(fontSize: 14, color: Colors.black87),
                       ),
                     ),
                     const SizedBox(height: 24),
-
                     DropdownButtonFormField<Instrument>(
                       decoration: InputDecoration(
                         labelText: 'Instrumento',
                         filled: true,
                         fillColor: const Color(0xFFF0F5F5),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12)),
                       ),
                       items: instruments.map((inst) {
                         return DropdownMenuItem<Instrument>(
@@ -158,14 +199,14 @@ class _LinkActivityToStudentScreenState extends State<LinkActivityToStudentScree
                       },
                     ),
                     const SizedBox(height: 16),
-
                     if (filteredActivities.isNotEmpty)
                       DropdownButtonFormField<Activity>(
                         decoration: InputDecoration(
                           labelText: 'Atividade',
                           filled: true,
                           fillColor: const Color(0xFFF0F5F5),
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12)),
                         ),
                         items: filteredActivities.map((act) {
                           return DropdownMenuItem<Activity>(
@@ -174,37 +215,35 @@ class _LinkActivityToStudentScreenState extends State<LinkActivityToStudentScree
                           );
                         }).toList(),
                         value: selectedActivity,
-                        onChanged: (value) => setState(() => selectedActivity = value),
+                        onChanged: _onActivityChanged,
                       ),
-
                     if (selectedActivity != null) ...[
                       const SizedBox(height: 16),
                       TextFormField(
                         readOnly: true,
-                        initialValue: selectedActivity!.description,
+                        controller: _descriptionController,
                         decoration: InputDecoration(
                           labelText: 'Descrição',
                           filled: true,
                           fillColor: const Color(0xFFF0F5F5),
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12)),
                         ),
                       ),
                       const SizedBox(height: 16),
                       TextFormField(
                         readOnly: true,
-                        initialValue: DateFormat('dd/MM/yyyy').format(selectedActivity!.date),
+                        controller: _dateController,
                         decoration: InputDecoration(
                           labelText: 'Data da atividade',
                           filled: true,
                           fillColor: const Color(0xFFF0F5F5),
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12)),
                         ),
                       ),
                     ],
-
-
                     const Spacer(),
-
                     SizedBox(
                       width: double.infinity,
                       height: 50,
@@ -215,7 +254,10 @@ class _LinkActivityToStudentScreenState extends State<LinkActivityToStudentScree
                         onPressed: _assignActivity,
                         child: const Text(
                           'Vincular >',
-                          style: TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.w600),
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600),
                         ),
                       ),
                     ),

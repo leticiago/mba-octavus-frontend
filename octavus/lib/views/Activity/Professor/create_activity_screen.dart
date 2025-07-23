@@ -98,13 +98,13 @@ class _CreateActivityScreenState extends State<CreateActivityScreen> {
 
       switch (_type) {
         case 0:
-          widget.onNavigateWithId(6, activityId);
-          break;
-        case 1:
           widget.onNavigateWithId(7, activityId);
           break;
-        case 2:
+        case 1:
           widget.onNavigateWithId(8, activityId);
+          break;
+        case 2:
+          widget.onNavigateWithId(9, activityId);
           break;
         default:
           widget.onNavigateWithId(0, '');
