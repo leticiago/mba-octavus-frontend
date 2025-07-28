@@ -209,7 +209,10 @@ class _AtividadeQuestionarioScreenState
                       color: const Color(0xFFE3EAF6),
                     ),
                     child: ExpansionTile(
-                      title: Text('Pergunta ${index + 1}'),
+                      title: Text(
+                          question['title'] ?? 'Pergunta sem título',
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
                       children: answers.map((answer) {
                         return RadioListTile<String>(
                           value: answer['id'],
