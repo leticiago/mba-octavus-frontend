@@ -4,7 +4,6 @@ import 'package:octavus/services/user/student_service.dart';
 import 'package:octavus/services/auth/token_service.dart';
 import '../../models/student_metrics_model.dart';
 
-
 class StudentProgressScreen extends StatefulWidget {
   final String studentId;
   final void Function(int)? onNavigate;
@@ -21,14 +20,14 @@ class StudentProgressScreen extends StatefulWidget {
 
 class _StudentProgressScreenState extends State<StudentProgressScreen> {
   late Future<StudentMetrics> _metricsFuture;
-  late final StudentService _service;      
-  late final TokenService _tokenService;   
+  late final StudentService _service;
+  late final TokenService _tokenService;
 
   @override
   void initState() {
     super.initState();
     _tokenService = TokenService();
-    _service = StudentService(tokenService: _tokenService);  
+    _service = StudentService(tokenService: _tokenService);
     _metricsFuture = _service.getStudentMetrics(widget.studentId);
   }
 
@@ -79,21 +78,21 @@ class _StudentProgressScreenState extends State<StudentProgressScreen> {
               children: [
                 const Text('Média de acertos', style: TextStyle(fontSize: 20)),
                 const SizedBox(height: 8),
-                Text('${(metrics.averageScore * 10).round()} %',
+                Text('${(metrics.averageScore).round()} %',
                     style: const TextStyle(fontSize: 36, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 16),
                 Text('Total de atividades: ${metrics.totalActivitiesDone}'),
                 const SizedBox(height: 32),
                 const Text('Média por tipo de atividade', style: TextStyle(fontSize: 18)),
-                const SizedBox(height: 50),
+                const SizedBox(height: 32),
 
                 SizedBox(
-                  height: 250,
+                  height: 200,
                   child: Padding(
                     padding: const EdgeInsets.only(bottom: 16),
                     child: BarChart(
                       BarChartData(
-                        maxY: 20,
+                        maxY: 100.0,
                         barGroups: List.generate(activityTypes.length, (i) {
                           final activityType = activityTypes[i];
                           final score = metrics.averageScoreByActivityType[activityType] ?? 0;
@@ -103,7 +102,7 @@ class _StudentProgressScreenState extends State<StudentProgressScreen> {
                             barRods: [
                               BarChartRodData(
                                 toY: score,
-                                width: 20,
+                                width: 8,
                                 color: Colors.purple,
                                 borderRadius: BorderRadius.circular(4),
                               ),
